@@ -28,7 +28,7 @@ def create_app(config_class=Config):
     csrf.init_app(app)
 
     # --- Register the user loader here ---
-    from app.authModels import User
+    from app.auth_models import User
 
     @login_manager.user_loader
     def load_user(user_id):

@@ -1,0 +1,19 @@
+/* Minimal duplication of original file; copied and snake_cased */
+:root {
+  --gold: #c7982d;
+  --charcoal: #353535;
+  --bg: #f6f7f9;
+  --text: #252525;
+}
+
+.form-title { text-align: center; }
+.form-desc { color: #666; }
+.form-input { margin-bottom: 8px; }
+.form-btn { padding: 8px 12px; }
+
+/* volunteer blocks */
+#volunteer_options_container { margin-top: 8px; }
+#other_volunteer_container { margin-top: 8px; }
+
+/* admin modal tweaks referenced by JS */
+#editModal { display: none; }

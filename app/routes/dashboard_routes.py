@@ -2,8 +2,8 @@ from flask import Blueprint, render_template, render_template_string, flash, red
 from flask_login import login_required, current_user
 from app.models import AlumniClassNote, AlumniUpdate, Alumni
 from werkzeug.security import check_password_hash, generate_password_hash
-from app.authForms import ChangePasswordForm
-from app.dashboardForms import EditFullEntryForm
+from app.auth_forms import ChangePasswordForm
+from app.dashboard_forms import EditFullEntryForm
 from app import db
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
