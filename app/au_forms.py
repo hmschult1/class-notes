@@ -11,11 +11,11 @@ from wtforms.widgets import ListWidget, CheckboxInput
 from flask_wtf.file import FileField, FileAllowed
 from app.utils.countries import country_list
 
-class step1Form(FlaskForm):
-    firstName = StringField('First Name', validators=[DataRequired()])
-    lastName = StringField('Last Name', validators=[DataRequired()])
-    maidenName = StringField('Maiden Name (if applicable)', validators=[Optional()])
-    genevaDegree = SelectMultipleField(
+class Step1Form(FlaskForm):
+    first_name = StringField('First Name', validators=[DataRequired()])
+    last_name = StringField('Last Name', validators=[DataRequired()])
+    maiden_name = StringField('Maiden Name (if applicable)', validators=[Optional()])
+    geneva_degrees = SelectMultipleField(
         "Geneva Degree(s)",
         choices=[
             ("TUG", "Undergraduate Degree"),
@@ -26,10 +26,10 @@ class step1Form(FlaskForm):
         widget=ListWidget(prefix_label=True),
         validators=[DataRequired()]
     )
-    undergradYear = StringField("Undergraduate Graduation Year", validators=[Optional()])
-    graduateYear = StringField("Graduate Graduation Year", validators=[Optional()])
-    onlineYear = StringField("Online Program Graduation Year", validators=[Optional()])
-    updateSelector = SelectMultipleField(
+    undergrad_year = StringField("Undergraduate Graduation Year", validators=[Optional()])
+    graduate_year = StringField("Graduate Graduation Year", validators=[Optional()])
+    online_year = StringField("Online Program Graduation Year", validators=[Optional()])
+    update_types = SelectMultipleField(
         "What information would you like to share with the College?",
         choices=[
             ('Contact Information', "Contact Information"),
@@ -43,26 +43,26 @@ class step1Form(FlaskForm):
         widget=ListWidget(prefix_label=True),
         validators=[DataRequired()]
     )
-    classNote = RadioField(
+    wants_class_note = RadioField(
         "Would you like to submit a Class Note in addition to updating your alumni record?",
         choices=[('Yes', 'Yes, I would like to submit a Class Note for publication'), ('No', 'No, I would rather not submit a Class Note at this time')],
         validators=[DataRequired()]
     )
 
 class ContactForm(FlaskForm):
-    prefSalutation = StringField('Preferred Salutation', validators=[Optional()])
+    pref_salutation = StringField('Preferred Salutation', validators=[Optional()])
     email = StringField('Email Address', validators=[DataRequired(), Email()])
-    phoneType = RadioField(
+    phone_type = RadioField(
         "Phone Type",
-        choices=[('Mobile', 'Mobile'), ('Home', 'Home')],
+        choices=[('mobile', 'Mobile'), ('home', 'Home')],
         validators=[DataRequired()]
     )
     phone = TelField('Phone Number', validators=[DataRequired()])
-    addressLine1 = StringField('Street Address (Line 1)', validators=[DataRequired()])
-    addressLine2 = StringField('Street Address (Line 2)', validators=[Optional()])
+    address_line1 = StringField('Street Address (Line 1)', validators=[DataRequired()])
+    address_line2 = StringField('Street Address (Line 2)', validators=[Optional()])
     city = StringField('City', validators=[DataRequired()])
     state = StringField('State / Region', validators=[DataRequired()])
-    postalCode = StringField('Postal / ZIP Code', validators=[DataRequired()])
+    postal_code = StringField('Postal / ZIP Code', validators=[DataRequired()])
     country = SelectField('Country', choices=[], validators=[DataRequired()])
     
     def __init__(self, *args, **kwargs):
@@ -70,7 +70,7 @@ class ContactForm(FlaskForm):
         self.country.choices = [('', 'Select a country')] + country_list
 
 class FamilyForm(FlaskForm):
-    maritalStatus = SelectField(
+    marital_status = SelectField(
         'Marital Status',
         choices=[
             ('', 'Select your status'),
@@ -82,13 +82,13 @@ class FamilyForm(FlaskForm):
         ],
         validators=[Optional()]
     )
-    spouseName = StringField("Spouse's Name", validators=[Optional()])
-    spouseGenevaGrad = RadioField(
+    spouse_name = StringField("Spouse's Name", validators=[Optional()])
+    spouse_geneva_grad = RadioField(
         "Is your spouse also a graduate of Geneva College?",
         choices=[('Yes', 'Yes'), ('No', 'No')],
         validators=[Optional()]
     )
-    spouseGenevaDegree = SelectMultipleField(
+    spouse_geneva_degrees = SelectMultipleField(
         "Spouse's Geneva Degree(s)",
         choices=[
             ("TUG", "Undergraduate"),
@@ -99,20 +99,20 @@ class FamilyForm(FlaskForm):
         widget=ListWidget(prefix_label=True),
         validators=[Optional()]
     )
-    spouseUndergradYear = StringField("Undergraduate Graduation Year", validators=[Optional()])
-    spouseGraduateYear = StringField("Graduate Graduation Year", validators=[Optional()])
-    spouseOnlineYear = StringField("Online Program Graduation Year", validators=[Optional()])
-    marryDate = DateField("Date of Marriage", format='%Y-%m-%d', validators=[Optional()])
+    spouse_undergrad_year = StringField("Undergraduate Graduation Year", validators=[Optional()])
+    spouse_graduate_year = StringField("Graduate Graduation Year", validators=[Optional()])
+    spouse_online_year = StringField("Online Program Graduation Year", validators=[Optional()])
+    marry_date = DateField("Date of Marriage", format='%Y-%m-%d', validators=[Optional()])
     
 class ChildForm(FlaskForm):
-    childsFirstName = StringField("Child's First Name", validators=[Optional()])
-    childsLastName = StringField("Child's Last Name", validators=[Optional()])
-    childGender = RadioField(
+    first_name = StringField("Child's First Name", validators=[Optional()])
+    last_name = StringField("Child's Last Name", validators=[Optional()])
+    gender = RadioField(
         "Child's Gender",
         choices=[('Son', 'Son'), ('Daughter', 'Daughter')],
         validators=[Optional()]
     )
-    childsBirthday = DateField("Child's Birthdate", format='%Y-%m-%d', validators=[Optional()])
+    birthday = DateField("Child's Birthdate", format='%Y-%m-%d', validators=[Optional()])
     
 class ChildrenForm(FlaskForm):
     children = FieldList(FormField(ChildForm), min_entries=1)    
@@ -120,23 +120,23 @@ class ChildrenForm(FlaskForm):
 class EmploymentForm(FlaskForm):
     employer = StringField("Employer", validators=[Optional()])
     position = StringField("Position", validators=[Optional()])
-    startDate = DateField("Start Date", format='%Y-%m-%d', validators=[Optional()])
+    start_date = DateField("Start Date", format='%Y-%m-%d', validators=[Optional()])
         
 class EducationForm(FlaskForm):
-    nonGEducation = StringField("Institution", validators=[Optional()])
-    nonGEducationDegree = StringField("Degree Earned", validators=[Optional()])
-    nonGEducationGradYear = StringField("Graduation Year", validators=[Optional()])
+    institution = StringField("Institution", validators=[Optional()])
+    degree = StringField("Degree Earned", validators=[Optional()])
+    graduation_year = StringField("Graduation Year", validators=[Optional()])
 
 class LifeAchieveForm(FlaskForm):
-    additionalUpdates = TextAreaField("Anything else you'd like to share with the College?", validators=[Optional()])
+    additional_updates = TextAreaField("Anything else you'd like to share with the College?", validators=[Optional()])
 
 class VolunteerForm(FlaskForm):
-    volunteerRadio = RadioField(
+    volunteer_radio = RadioField(
         "Are you interested in volunteering as a Geneva alumni?",
         choices=[('Yes', 'Yes, show me volunteer opportunities!'), ('No', 'No, I am not interested at this time.')],
         validators=[Optional()]
     )
-    volunteerChoices = SelectMultipleField(
+    volunteer_choices = SelectMultipleField(
         "Select Volunteer Opportunities:",
         choices=[
             ('Help with admissions in my area', "Help with admissions in my area"),
@@ -149,10 +149,10 @@ class VolunteerForm(FlaskForm):
         widget=ListWidget(prefix_label=True),
         validators=[Optional()]
     )
-    otherVolunteer = TextAreaField("Other Volunteer Ideas", validators=[Optional()])
+    other_volunteer = TextAreaField("Other Volunteer Ideas", validators=[Optional()])
 
 class ClassNoteForm(FlaskForm):
-    classNote = TextAreaField(
+    class_note_text = TextAreaField(
         'Class Note',
         validators=[
             Optional(),

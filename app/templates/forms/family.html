@@ -11,7 +11,7 @@
   <h2 style="margin-top:1.25rem">Family Information</h2>
 
   {% for field in [
-  form.maritalStatus, form.marryDate, form.spouseName,
+  form.marital_status, form.marry_date, form.spouse_name,
   ] %}
   <div class="field">
     <label class="form-label" for="{{ field.id }}">
@@ -23,8 +23,8 @@
   {% endfor %}
 
   <div class="field">
-    {{ form.spouseGenevaGrad.label }}
-    {% for option in form.spouseGenevaGrad %}
+    {{ form.spouse_geneva_grad.label }}
+    {% for option in form.spouse_geneva_grad %}
     <div class="form-checkbox-row">
       {{ option(class="form-checkbox", id=option.id) }}
       <label class="form-label" for="{{ option.id }}">{{ option.label.text }}</label>
@@ -35,10 +35,10 @@
   <!-- Hidden by default, shown only spouse is a Geneva Grad -->
   <div class="field" id="spouseGradYearContainer" style="display: none;">
   <label class="form-label">
-    {{ form.spouseGenevaDegree.label }}
+    {{ form.spouse_geneva_degrees.label }}
   </label>
 
-  {% for option in form.spouseGenevaDegree %}
+  {% for option in form.spouse_geneva_degrees %}
   <div class="geneva-degree-row">
     <div class="geneva-degree-option">
       {{ option(class="form-checkbox", id=option.id) }}
@@ -48,17 +48,17 @@
     <div class="geneva-degree-year">
       {% if option._value() == "TUG" %}
         <div id="undergrad-wrapper" style="display:none;">
-          {{ form.spouseUndergradYear(class="form-input", placeholder="Grad Year") }}
+          {{ form.spouse_undergrad_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
       {% elif option._value() == "Grad" %}
         <div id="graduate-wrapper" style="display:none;">
-          {{ form.spouseGraduateYear(class="form-input", placeholder="Grad Year") }}
+          {{ form.spouse_graduate_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
       {% elif option._value() == "ODP" %}
         <div id="online-wrapper" style="display:none;">
-          {{ form.spouseOnlineYear(class="form-input", placeholder="Grad Year") }}
+          {{ form.spouse_online_year(class="form-input", placeholder="Grad Year") }}
         </div>
       {% endif %}
     </div>
