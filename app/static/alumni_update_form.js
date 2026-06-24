@@ -1,74 +1,287 @@
-(function(){
-  document.addEventListener('DOMContentLoaded', function(){
-    function qs(sel){return document.querySelector(sel)}
-    function qsa(sel){return Array.from(document.querySelectorAll(sel))}
+// reveal "other" option if chosen on volunteer dropdown
+document.addEventListener("DOMContentLoaded", function () {
+  const other_checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const other_container = document.getElementById("otherVolunteerContainer");
 
-    const volunteer_options_container = qs('#volunteer_options_container');
-    const other_volunteer_container = qs('#other_volunteer_container');
-    const volunteer_radios = qsa('input[name="volunteer_radio"]');
-    const volunteer_choices = qsa('input[name="volunteer_choices"]');
+  function toggle_other_field() {
+    let is_other_selected = false;
 
-    function updateVolunteerVisibility(){
-      let anyYes=false;
-      for(const r of volunteer_radios){ if(r.checked && (r.value.toLowerCase()==='yes' || r.value==='1')) anyYes=true }
-      if(volunteer_options_container) volunteer_options_container.style.display = anyYes ? 'block' : 'none';
+    other_checkboxes.forEach(function(checkbox) {
+      if (checkbox.value.toLowerCase() === "other" && checkbox.checked) {
+        is_other_selected = true;
+      }
+    });
 
-      let otherChecked=false;
-      for(const c of volunteer_choices){ if(c.checked && (c.value.toLowerCase()==='other' || c.value==='Other')) otherChecked=true }
-      if(other_volunteer_container) other_volunteer_container.style.display = otherChecked ? 'block' : 'none';
+    if (other_container) {
+      other_container.style.display = is_other_selected ? 'block' : 'none';
+    }
+  }
+
+  // Add event listeners to all checkboxes
+  other_checkboxes.forEach(function(checkbox) {
+    checkbox.addEventListener("change", toggle_other_field);
+  });
+
+  // Initial check on page load
+  toggle_other_field();
+});
+
+// degree type selector - add grad year field to degrees selected
+  function toggle_grad_year_fields() {
+    const tug = document.querySelector('input[name="genevaDegree"][value="TUG"]');
+    const grad = document.querySelector('input[name="genevaDegree"][value="Grad"]');
+    const odp = document.querySelector('input[name="genevaDegree"][value="ODP"]');
+
+    document.getElementById('undergrad-wrapper').style.display =
+        tug && tug.checked ? 'inline-block' : 'none';
+
+    document.getElementById('graduate-wrapper').style.display =
+        grad && grad.checked ? 'inline-block' : 'none';
+
+    document.getElementById('online-wrapper').style.display =
+        odp && odp.checked ? 'inline-block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('input[name="genevaDegree"]').forEach(cb => {
+    cb.addEventListener('change', toggle_grad_year_fields);
+  });
+
+  toggle_grad_year_fields();
+});
+
+// spouse degree type selector - add grad year field to degrees selected
+  function toggle_spouse_grad_year_fields() {
+    const tug = document.querySelector('input[name="spouseGenevaDegree"][value="TUG"]');
+    const grad = document.querySelector('input[name="spouseGenevaDegree"][value="Grad"]');
+    const odp = document.querySelector('input[name="spouseGenevaDegree"][value="ODP"]');
+
+    document.getElementById('undergrad-wrapper').style.display =
+        tug && tug.checked ? 'inline-block' : 'none';
+
+    document.getElementById('graduate-wrapper').style.display =
+        grad && grad.checked ? 'inline-block' : 'none';
+
+    document.getElementById('online-wrapper').style.display =
+        odp && odp.checked ? 'inline-block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('input[name="spouseGenevaDegree"]').forEach(cb => {
+    cb.addEventListener('change', toggle_spouse_grad_year_fields);
+  });
+
+  toggle_spouse_grad_year_fields();
+});
+
+// reveal field for spouse's grad year if option "yes" selected
+document.addEventListener("DOMContentLoaded", function () {
+    const spouse_grad_radios = document.querySelectorAll(
+      'input[name="spouseGenevaGrad"]'
+    );
+
+    const spouse_grad_year_field = document.getElementById("spouseGradYearContainer");
+
+    function toggle_spouse_grad_year() {
+      const selected = document.querySelector(
+        'input[name="spouseGenevaGrad"]:checked'
+      );
+
+      if (selected && selected.value === "Yes") {
+        spouse_grad_year_field.style.display = "block";
+      } else {
+        spouse_grad_year_field.style.display = "none";
+      }
     }
 
-    volunteer_radios.forEach(r=> r.addEventListener('change', updateVolunteerVisibility));
-    volunteer_choices.forEach(c=> c.addEventListener('change', updateVolunteerVisibility));
-    updateVolunteerVisibility();
+    spouse_grad_radios.forEach(radio => {
+      radio.addEventListener("change", toggle_spouse_grad_year);
+    });
 
-    // Admin modal: map data-d* attributes into modal inputs when edit links clicked
-    qsa('.edit-link').forEach(link=>{
-      link.addEventListener('click', function(e){
-        e.preventDefault();
-        const modal = qs('#editModal');
-        if(!modal) return;
-        const mapping = {
-          'dfirst':'first_name','dlast':'last_name','dmaiden':'maiden_name','demail':'email','dphone':'phone',
-          'daddress1':'address_line1','daddress2':'address_line2','dcity':'city','dstate':'state','dzip':'postal_code','dcountry':'country',
-          'dmarital':'marital_status','dspouse':'spouse_name','dmarrydate':'marry_date','demployer':'employer','dposition':'position',
-          'deducation':'institution','dupdates':'additional_updates','dother':'other_volunteer','dnote':'class_note_text','id':'note_id','did':'note_id'
-        };
-        for(const dataKey in mapping){
-          const inputName = mapping[dataKey];
-          const val = link.dataset[dataKey] || '';
-          const input = modal.querySelector('[name="'+inputName+'"]');
-          if(!input) continue;
-          if(input.type==='checkbox'){
-            // multiple checkboxes: set checked where value in comma list
-            const vals = val.split(',').map(s=>s.trim()).filter(Boolean);
-            const boxes = modal.querySelectorAll('[name="'+inputName+'"]');
-            if(boxes.length){
-              boxes.forEach(b=> b.checked = vals.includes(b.value));
-            } else {
-              input.checked = vals.includes(input.value);
-            }
-          } else if(input.type==='radio'){
-            const radios = modal.querySelectorAll('[name="'+inputName+'"]');
-            radios.forEach(r=> r.checked = (r.value === val));
-          } else {
-            input.value = val;
-          }
-        }
+    // Handle page refresh / pre-populated values
+    toggle_spouse_grad_year();
+});
 
-        const volunteerRaw = link.dataset.dvolunteer || '';
-        if(volunteerRaw && modal.querySelector('#volunteer_options_container')){
-          modal.querySelector('#volunteer_options_container').style.display = 'block';
-        }
+// repeatable birth annoucemnet section 
+let birth_section_count = 0;
 
-        if(typeof bootstrap !== 'undefined'){
-          const bm = bootstrap.Modal.getOrCreateInstance(modal);
-          bm.show();
-        } else {
-          modal.style.display='block';
-        }
-      })
-    })
+function add_birth_section() {
+  birth_section_count++;
 
+  const template = document.querySelector(".birth-announcement-template");
+  const clone = template.cloneNode(true);
+  clone.style.display = "block";
+
+  // Update all input fields to use unique names/IDs
+  const inputs = clone.querySelectorAll('input, textarea, select');
+  inputs.forEach(input => {
+    if (input.name) {
+      // Handle array-style fields
+      if (input.name.includes("[]")) {
+        input.name = input.name.replace("[]", `[${birth_section_count}]`);
+      }
+
+      // Handle gender radios specifically
+      if (input.name.startsWith("AlumniChildGender")) {
+        input.name = `AlumniChildGender_${birth_section_count}`;
+      }
+    }
+
+    // Reset input values
+    if (input.type === "radio" || input.type === "checkbox") {
+      input.checked = false;
+    } else {
+      input.value = "";
+    }
   });
-})();
+
+  // Append to container
+  document.getElementById("birthAnnouncementsContainer").appendAlumniChild(clone);
+}
+
+function remove_birth_section(button) {
+  const section = button.closest(".birth-announcement-group");
+  if (section) {
+    section.remove();
+  }
+}
+
+// image drag and drop 
+  document.addEventListener('DOMContentLoaded', function () {
+  const drop_zone = document.getElementById('drop-zone');
+  const image_input = document.getElementById('image-input');
+  const canvas = document.getElementById('preview-canvas');
+  const hidden_input = document.getElementById('resized-image');
+
+  const max_width = 600;   // Desired width
+  const max_height = 400;  // Desired height
+
+  drop_zone.addEventListener('click', () => image_input.click());
+
+  drop_zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  drop_zone.classList.add('hover');
+  });
+
+  drop_zone.addEventListener('dragleave', () => {
+    drop_zone.classList.remove('hover');
+  });
+
+  drop_zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+  drop_zone.classList.remove('hover');
+  const file = e.dataTransfer.files[0];
+  handle_image(file);
+  });
+
+  image_input.addEventListener('change', () => {
+    const file = image_input.files[0];
+  handle_image(file);
+  });
+
+  function handle_image(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+
+  const reader = new FileReader();
+  reader.onload = function (event) {
+      const img = new Image();
+  img.onload = function () {
+        const ratio = Math.min(max_width / img.width, max_height / img.height);
+  const width = img.width * ratio;
+  const height = img.height * ratio;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, width, height);
+  ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert canvas to base64
+        canvas.toBlob((blob) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+    hidden_input.value = reader.result;  // Base64 encoded image
+          };
+  reader.readAsDataURL(blob);
+        }, 'image/jpeg', 0.85);  // JPEG with 85% quality
+      };
+  img.src = event.target.result;
+    };
+  reader.readAsDataURL(file);
+  }
+});
+
+// volunteer opportunities if Yes
+// reveal field for spouse's grad year if option "yes" selected
+document.addEventListener("DOMContentLoaded", function () {
+    const volunteer_radios = document.querySelectorAll(
+      'input[name="volunteerRadio"]'
+    );
+
+    const volunteer_options = document.getElementById("volunteerOptionsContainer");
+
+    function toggle_volunteer_radio() {
+      const selected = document.querySelector(
+        'input[name="volunteerRadio"]:checked'
+      );
+
+      if (selected && selected.value === "Yes") {
+        volunteer_options.style.display = "block";
+      } else {
+        volunteer_options.style.display = "none";
+      }
+    }
+
+    volunteer_radios.forEach(radio => {
+      radio.addEventListener("change", toggle_volunteer_radio);
+    });
+
+    // Handle page refresh / pre-populated values
+    toggle_volunteer_radio();
+});
+
+// prev and next buttons
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector("form");
+  const nav_buttons = document.querySelectorAll("button[name='nav']");
+
+  nav_buttons.forEach(button => {
+    button.addEventListener("click", function () {
+      // Mark which button was clicked
+      const action = this.value;
+
+      // Create or update a hidden input to submit the action
+
+      let nav_input = document.querySelector("input[name='nav']");
+      if (!nav_input) {
+        nav_input = document.createElement("input");
+        nav_input.type = "hidden";
+        nav_input.name = "nav";
+        form.appendAlumniChild(nav_input);
+      }
+
+      nav_input.value = action;
+
+      // Optionally disable the buttons after click
+      nav_buttons.forEach(btn => btn.disabled = true);
+
+      // Submit the form manually
+      form.submit();
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const imageUrl = "{{ image_url }}";
+    if (imageUrl) {
+      const preview = document.getElementById("image-preview");
+      if (preview) {
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.style.maxWidth = "100%";
+        preview.innerHTML = "";
+        preview.appendAlumniChild(img);
+      }
+    }
+  });
+});
