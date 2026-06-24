@@ -1,3 +1,13 @@
+"""SQLAlchemy models for the alumni update application.
+
+This module defines the normalized data model used by the multi-step
+alumni update form flow. Models correspond to the normalized schema
+(`Alumni`, `AlumniUpdate`, related address/education/family/child
+tables, and class notes). These classes are referenced by the form
+submission code in `app/routes/form_routes.py` when persisting session
+data to the database.
+"""
+
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from app import db
@@ -5,11 +15,20 @@ import enum
 
 
 class PhoneType(enum.Enum):
+    """Enum stored in `alumni.phone_type` to indicate phone kind.
+
+    Stored values are short strings matched to WTForms radio choices.
+    """
     MOBILE = "mobile"
     HOME = "home"
 
 
 class Alumni(db.Model):
+    """Primary alumni/person table.
+
+    Holds canonical contact fields and relationships to addresses,
+    Geneva education records, and `AlumniUpdate` submissions.
+    """
     __tablename__ = "alumni"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -42,6 +61,12 @@ class Alumni(db.Model):
 
 
 class AlumniUpdate(db.Model):
+    """A single submission/update event linked to an `Alumni`.
+
+    This table stores which update types were selected, class-note
+    preference, volunteer selections, and relationships to child,
+    family, employment, education, and class note records.
+    """
     __tablename__ = "alumni_updates"
 
     id = db.Column(db.Integer, primary_key=True)

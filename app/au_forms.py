@@ -1,3 +1,12 @@
+"""WTForms definitions for the alumni update multi-step flow.
+
+Each FlaskForm maps closely to a section of the multi-step wizard and
+to session keys used in `form_routes.py`. Field names (e.g.
+`geneva_degrees`, `spouse_geneva_degrees`, `volunteer_radio`) are
+intentionally snake_case to match the session keys and template
+input `name` attributes.
+"""
+
 from wtforms import FieldList, FormField
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -50,6 +59,10 @@ class Step1Form(FlaskForm):
     )
 
 class ContactForm(FlaskForm):
+    """Contact information form.
+
+    Fields map to session keys like `email`, `phone`, `address_line1`, etc.
+    """
     pref_salutation = StringField('Preferred Salutation', validators=[Optional()])
     email = StringField('Email Address', validators=[DataRequired(), Email()])
     phone_type = RadioField(
@@ -70,6 +83,11 @@ class ContactForm(FlaskForm):
         self.country.choices = [('', 'Select a country')] + country_list
 
 class FamilyForm(FlaskForm):
+    """Family-related fields.
+
+    `spouse_geneva_grad` and `spouse_geneva_degrees` indicate whether the
+    spouse attended Geneva and which degree types were selected.
+    """
     marital_status = SelectField(
         'Marital Status',
         choices=[
@@ -105,6 +123,9 @@ class FamilyForm(FlaskForm):
     marry_date = DateField("Date of Marriage", format='%Y-%m-%d', validators=[Optional()])
     
 class ChildForm(FlaskForm):
+    """A single child's data. Used inside `ChildrenForm` as a
+    `FieldList` of `FormField(ChildForm)`.
+    """
     first_name = StringField("Child's First Name", validators=[Optional()])
     last_name = StringField("Child's Last Name", validators=[Optional()])
     gender = RadioField(
@@ -115,22 +136,32 @@ class ChildForm(FlaskForm):
     birthday = DateField("Child's Birthdate", format='%Y-%m-%d', validators=[Optional()])
     
 class ChildrenForm(FlaskForm):
+    # Contains a variable-length list of `ChildForm` entries.
     children = FieldList(FormField(ChildForm), min_entries=1)    
             
 class EmploymentForm(FlaskForm):
+    """Employment update fields."""
     employer = StringField("Employer", validators=[Optional()])
     position = StringField("Position", validators=[Optional()])
     start_date = DateField("Start Date", format='%Y-%m-%d', validators=[Optional()])
         
 class EducationForm(FlaskForm):
+    """Non-Geneva education update fields."""
     institution = StringField("Institution", validators=[Optional()])
     degree = StringField("Degree Earned", validators=[Optional()])
     graduation_year = StringField("Graduation Year", validators=[Optional()])
 
 class LifeAchieveForm(FlaskForm):
+    """Free-text field for additional updates or achievements."""
     additional_updates = TextAreaField("Anything else you'd like to share with the College?", validators=[Optional()])
 
 class VolunteerForm(FlaskForm):
+    """Volunteer interest and choices.
+
+    `volunteer_radio` is a simple Yes/No radio; `volunteer_choices` is a
+    checkbox list. `other_volunteer` holds free-form text when 'Other' is
+    selected.
+    """
     volunteer_radio = RadioField(
         "Are you interested in volunteering as a Geneva alumni?",
         choices=[('Yes', 'Yes, show me volunteer opportunities!'), ('No', 'No, I am not interested at this time.')],
@@ -152,6 +183,11 @@ class VolunteerForm(FlaskForm):
     other_volunteer = TextAreaField("Other Volunteer Ideas", validators=[Optional()])
 
 class ClassNoteForm(FlaskForm):
+    """Fields for submitting a class note and an image.
+
+    The `image` field accepts an uploaded file; `existing_image`
+    can carry a previously-uploaded filename during editing.
+    """
     class_note_text = TextAreaField(
         'Class Note',
         validators=[
@@ -171,6 +207,7 @@ class ClassNoteForm(FlaskForm):
     existing_image = HiddenField()
     
 class FinalSubmitForm(FlaskForm):
+    """Simple confirmation form used on the final review page."""
     submit = SubmitField("Submit Final")
     
     

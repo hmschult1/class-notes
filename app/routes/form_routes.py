@@ -1,3 +1,12 @@
+"""Routes and helpers for the alumni update multi-step form.
+
+This module implements the form wizard endpoints and helper functions
+that persist session data into normalized SQLAlchemy models on final
+submission. Key helpers include image filename building, date parsing,
+and review section generation. Keep route handlers thin — business
+logic that is reused lives in the small helper functions below.
+"""
+
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
 from app import db
 from app.models import (
@@ -17,11 +26,15 @@ import os
 import re
 from werkzeug.utils import secure_filename
 
+
 # IMAGE FILENAME HELPER FUNCTION
 def build_image_filename(class_note: AlumniClassNote, original_filename=None):
-    """
-    Build a filename like: first_last_IMG_<id>.ext
-    using safe characters only. Defaults to .jpg if no filename is provided.
+    """Create a filesystem-safe filename for a class-note image.
+
+    Uses the associated alumnus' first/last name and the class_note id to
+    construct a readable filename, normalized to lowercase and limited
+    to alphanumerics and underscores. If no original filename is given,
+    defaults to .jpg.
     """
     # Default extension to .jpg
     ext = '.jpg'
@@ -63,6 +76,17 @@ def parse_date(value):
     except ValueError:
         return None
 
+
+# NAVIGATION HELPERS
+def navigate_update(current_update, direction="next"):
+    """Navigate between the selected update pages.
+
+    The wizard records the list of selected update types in session
+    (`update_types`). Given the current update label and a direction
+    ("next" or "prev"), return a redirect to the next route in the
+    sequence. If the update isn't found we return the first step.
+    """
+
 # CONDITIONAL LOGIC HELPER FUNCTIONS 
 UPDATE_ROUTES = {
     "Contact Information": "form.form_contact",
@@ -97,6 +121,11 @@ def navigate_update(current_update, direction="next"):
     return redirect(url_for(UPDATE_ROUTES[next_update])) 
 
 def next_after_updates():
+    """Return the next route after completing update pages.
+
+    If the user requested a class note, the next page is the class-note
+    form; otherwise we move to the volunteer page or final review.
+    """
     if session.get("wants_class_note") == "Yes":
         return redirect(url_for("form.form_class_note"))
 
@@ -205,6 +234,16 @@ def parse_session_date(value):
             pass
 
     return None
+
+
+# REVIEW / RENDER HELPERS
+def build_review_sections(session_data):
+    """Build the list of sections/fields shown on the review page.
+
+    This converts the raw session keys into a structure consumed by
+    `forms/review.html` (title + list of label/value pairs), filtering
+    out empty values.
+    """
 
 @form_bp.route('/family', methods=['GET', 'POST'])
 def form_family():

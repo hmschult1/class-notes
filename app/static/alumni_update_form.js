@@ -1,3 +1,14 @@
+// Client-side behaviors for the alumni update form.
+//
+// Notes:
+// - Input `name` attributes are expected to be snake_case and match the
+//   WTForms/Flask session keys used server-side (e.g. `geneva_degrees`,
+//   `spouse_geneva_degrees`, `volunteer_radio`). Keep those in sync when
+//   updating forms or templates.
+// - This file provides small UI helpers only (show/hide fields, image
+//   resizing, add/remove birth sections). It does not change form data
+//   submission semantics.
+//
 // reveal "other" option if chosen on volunteer dropdown
 document.addEventListener("DOMContentLoaded", function () {
   const other_checkboxes = document.querySelectorAll('input[type="checkbox"]');
