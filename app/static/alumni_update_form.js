@@ -1,7 +1,7 @@
 // reveal "other" option if chosen on volunteer dropdown
 document.addEventListener("DOMContentLoaded", function () {
   const other_checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  const other_container = document.getElementById("otherVolunteerContainer");
+  const other_container = document.getElementById("other_volunteer_container");
 
   function toggle_other_field() {
     let is_other_selected = false;
@@ -28,9 +28,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // degree type selector - add grad year field to degrees selected
   function toggle_grad_year_fields() {
-    const tug = document.querySelector('input[name="genevaDegree"][value="TUG"]');
-    const grad = document.querySelector('input[name="genevaDegree"][value="Grad"]');
-    const odp = document.querySelector('input[name="genevaDegree"][value="ODP"]');
+    const tug = document.querySelector('input[name="geneva_degrees"][value="TUG"]');
+    const grad = document.querySelector('input[name="geneva_degrees"][value="Grad"]');
+    const odp = document.querySelector('input[name="geneva_degrees"][value="ODP"]');
 
     document.getElementById('undergrad-wrapper').style.display =
         tug && tug.checked ? 'inline-block' : 'none';
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('input[name="genevaDegree"]').forEach(cb => {
+  document.querySelectorAll('input[name="geneva_degrees"]').forEach(cb => {
     cb.addEventListener('change', toggle_grad_year_fields);
   });
 
@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // spouse degree type selector - add grad year field to degrees selected
   function toggle_spouse_grad_year_fields() {
-    const tug = document.querySelector('input[name="spouseGenevaDegree"][value="TUG"]');
-    const grad = document.querySelector('input[name="spouseGenevaDegree"][value="Grad"]');
-    const odp = document.querySelector('input[name="spouseGenevaDegree"][value="ODP"]');
+    const tug = document.querySelector('input[name="spouse_geneva_degrees"][value="TUG"]');
+    const grad = document.querySelector('input[name="spouse_geneva_degrees"][value="Grad"]');
+    const odp = document.querySelector('input[name="spouse_geneva_degrees"][value="ODP"]');
 
     document.getElementById('undergrad-wrapper').style.display =
         tug && tug.checked ? 'inline-block' : 'none';
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('input[name="spouseGenevaDegree"]').forEach(cb => {
+  document.querySelectorAll('input[name="spouse_geneva_degrees"]').forEach(cb => {
     cb.addEventListener('change', toggle_spouse_grad_year_fields);
   });
 
@@ -77,14 +77,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // reveal field for spouse's grad year if option "yes" selected
 document.addEventListener("DOMContentLoaded", function () {
     const spouse_grad_radios = document.querySelectorAll(
-      'input[name="spouseGenevaGrad"]'
+      'input[name="spouse_geneva_grad"]'
     );
 
     const spouse_grad_year_field = document.getElementById("spouseGradYearContainer");
 
     function toggle_spouse_grad_year() {
       const selected = document.querySelector(
-        'input[name="spouseGenevaGrad"]:checked'
+        'input[name="spouse_geneva_grad"]:checked'
       );
 
       if (selected && selected.value === "Yes") {
@@ -136,7 +136,7 @@ function add_birth_section() {
   });
 
   // Append to container
-  document.getElementById("birthAnnouncementsContainer").appendAlumniChild(clone);
+  document.getElementById("children-container").appendAlumniChild(clone);
 }
 
 function remove_birth_section(button) {
@@ -216,14 +216,14 @@ function remove_birth_section(button) {
 // reveal field for spouse's grad year if option "yes" selected
 document.addEventListener("DOMContentLoaded", function () {
     const volunteer_radios = document.querySelectorAll(
-      'input[name="volunteerRadio"]'
+      'input[name="volunteer_radio"]'
     );
 
-    const volunteer_options = document.getElementById("volunteerOptionsContainer");
+    const volunteer_options = document.getElementById("volunteer_options_container");
 
     function toggle_volunteer_radio() {
       const selected = document.querySelector(
-        'input[name="volunteerRadio"]:checked'
+        'input[name="volunteer_radio"]:checked'
       );
 
       if (selected && selected.value === "Yes") {
