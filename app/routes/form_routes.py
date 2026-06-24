@@ -1,21 +1,24 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-from app.models import db, AlumniClassNote, AlumniChild
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
+from app import db
+from app.models import (
+    Alumni, AlumniUpdate, AlumniAddress, AlumniGenevaEducation,
+    AlumniFamilyUpdate, AlumniChild, AlumniEmploymentUpdate,
+    AlumniEducationUpdate, AlumniClassNote, PhoneType
+)
 from app.utils.sendgrid import send_email
 from datetime import datetime, date
-from app.auForms import step1Form, ContactForm, AlumniChildrenForm, FamilyForm, EmploymentForm, EducationForm, LifeAchieveForm, VolunteerForm, AlumniClassNoteForm, FinalSubmitForm
-from flask import current_app
-from flask import session, request
+from app.auForms import (
+    Step1Form, ContactForm, ChildrenForm, FamilyForm, EmploymentForm,
+    EducationForm, LifeAchieveForm, VolunteerForm, ClassNoteForm, FinalSubmitForm
+)
 import base64
 import uuid
 import os
-from flask import (
-    Blueprint, render_template, request, session, redirect, url_for, flash
-)
 import re
 from werkzeug.utils import secure_filename
 
 # IMAGE FILENAME HELPER FUNCTION
-def build_image_filename(note, original_filename=None):
+def build_image_filename(class_note: AlumniClassNote, original_filename=None):
     """
     Build a filename like: first_last_IMG_<id>.ext
     using safe characters only. Defaults to .jpg if no filename is provided.
@@ -28,11 +31,16 @@ def build_image_filename(note, original_filename=None):
         if given_ext:
             ext = given_ext.lower()
 
-    # Use data from the note
-    first = (note.first_name or "").strip()
-    last = (note.last_name or "").strip()
+    # Use data from the related alumnus via alumni_update
+    first = ""
+    last = ""
+    try:
+        first = (class_note.alumni_update.alumnus.first_name or "").strip()
+        last = (class_note.alumni_update.alumnus.last_name or "").strip()
+    except Exception:
+        pass
 
-    parts = [first, last, "IMG", str(note.id)]
+    parts = [first, last, "IMG", str(class_note.id)]
     base = "_".join(p for p in parts if p)
 
     # Normalize: lowercase and only a–z, 0–9, underscore
@@ -40,7 +48,7 @@ def build_image_filename(note, original_filename=None):
     base = re.sub(r'[^a-z0-9_]+', '_', base).strip('_')
 
     if not base:
-        base = f"img_{note.id}"
+        base = f"img_{class_note.id}"
 
     filename = f"{base}{ext}"
     return secure_filename(filename)
@@ -59,7 +67,7 @@ def parse_date(value):
 UPDATE_ROUTES = {
     "Contact Information": "form.form_contact",
     "Family Update": "form.form_family",
-    "Birth Announcement": "form.form_AlumniChildren",
+    "Birth Announcement(s)": "form.form_children",
     "Employment Update": "form.form_employment",
     "Additional Education": "form.form_education",
     "Life Achievements": "form.form_achievement",
@@ -89,8 +97,8 @@ def navigate_update(current_update, direction="next"):
     return redirect(url_for(UPDATE_ROUTES[next_update])) 
 
 def next_after_updates():
-    if session.get("class_note_option") == "Yes":
-        return redirect(url_for("form.form_AlumniClassNote"))
+    if session.get("wants_class_note") == "Yes":
+        return redirect(url_for("form.form_class_note"))
 
     return redirect(url_for("form.form_volunteer"))
 
@@ -103,44 +111,42 @@ def last_selected_update_url():
 
 @form_bp.route('/step1', methods=['GET', 'POST'])
 def form_step1():
-    form = step1Form()
+    form = Step1Form()
 
     if request.method == 'POST':
         nav = request.form.get('nav')  # 'next' or 'prev'
         if nav == 'next' and form.validate_on_submit():
             # Save form data to session
-            session['first_name'] = form.firstName.data
-            session['last_name'] = form.lastName.data
-            session['maiden_name'] = form.maidenName.data
-            
-            session['geneva_degree'] = form.genevaDegree.data
-            session['undergrad_year'] = form.undergradYear.data
-            session['graduate_year'] = form.graduateYear.data
-            session['online_year'] = form.onlineYear.data
-            
-            session['update_types'] = form.updateSelector.data
-            
-            selected_updates = form.updateSelector.data
+            session['first_name'] = form.first_name.data
+            session['last_name'] = form.last_name.data
+            session['maiden_name'] = form.maiden_name.data
+
+            session['geneva_degrees'] = form.geneva_degrees.data
+            session['undergrad_year'] = form.undergrad_year.data
+            session['graduate_year'] = form.graduate_year.data
+            session['online_year'] = form.online_year.data
+
+            selected_updates = form.update_types.data
             session['update_types'] = selected_updates
             session['update_index'] = 0
-            
-            session['class_note_option'] = form.AlumniClassNote.data
 
-            first_update = selected_updates[0]
-            return redirect(url_for(UPDATE_ROUTES[first_update]))
-            
+            session['wants_class_note'] = form.wants_class_note.data
+
+            if selected_updates:
+                first_update = selected_updates[0]
+                return redirect(url_for(UPDATE_ROUTES[first_update]))
 
     # Prepopulate form from session if available
     if request.method == 'GET':
-        form.firstName.data = session.get('first_name')
-        form.lastName.data = session.get('last_name')
-        form.maidenName.data = session.get('maiden_name')
-        form.genevaDegree.data = session.get('geneva_degree')
-        form.undergradYear.data = session.get('undergrad_year')
-        form.graduateYear.data = session.get('graduate_year')
-        form.onlineYear.data = session.get('online_year')
-        form.updateSelector.data = session.get('update_types', [])
-        form.AlumniClassNote.data = session.get('class_note_option')
+        form.first_name.data = session.get('first_name')
+        form.last_name.data = session.get('last_name')
+        form.maiden_name.data = session.get('maiden_name')
+        form.geneva_degrees.data = session.get('geneva_degrees')
+        form.undergrad_year.data = session.get('undergrad_year')
+        form.graduate_year.data = session.get('graduate_year')
+        form.online_year.data = session.get('online_year')
+        form.update_types.data = session.get('update_types', [])
+        form.wants_class_note.data = session.get('wants_class_note')
 
     return render_template('forms/step1.html', form=form)
 
@@ -153,15 +159,15 @@ def form_contact():
         nav = request.form.get('nav')  # 'next' or 'prev'
         if nav == 'next' and form.validate_on_submit():
             # Save form data to session
-            session['pref_salutation'] = form.prefSalutation.data
+            session['pref_salutation'] = form.pref_salutation.data
             session['email'] = form.email.data
-            session['phone_type'] = form.phoneType.data
+            session['phone_type'] = form.phone_type.data
             session['phone'] = form.phone.data
-            session['address_line1'] = form.addressLine1.data
-            session['address_line2'] = form.addressLine2.data
+            session['address_line1'] = form.address_line1.data
+            session['address_line2'] = form.address_line2.data
             session['city'] = form.city.data
             session['state'] = form.state.data
-            session['postal_code'] = form.postalCode.data
+            session['postal_code'] = form.postal_code.data
             session['country'] = form.country.data
             
             return navigate_update("Contact Information", "next")
@@ -171,15 +177,15 @@ def form_contact():
 
     # Prepopulate form from session if available
     if request.method == 'GET':
-        form.prefSalutation.data = session.get('pref_salutation')
+        form.pref_salutation.data = session.get('pref_salutation')
         form.email.data = session.get('email')
-        form.phoneType.data = session.get('phone_type')
+        form.phone_type.data = session.get('phone_type')
         form.phone.data = session.get('phone')
-        form.addressLine1.data = session.get('address_line1')
-        form.addressLine2.data = session.get('address_line2')
+        form.address_line1.data = session.get('address_line1')
+        form.address_line2.data = session.get('address_line2')
         form.city.data = session.get('city')
         form.state.data = session.get('state')
-        form.postalCode.data = session.get('postal_code')
+        form.postal_code.data = session.get('postal_code')
         form.country.data = session.get('country')
         
     return render_template('forms/contact.html', form=form)
@@ -208,15 +214,15 @@ def form_family():
         nav = request.form.get('nav')  # 'next' or 'prev'
         if nav == 'next' and form.validate_on_submit():
             # Save form data to session
-            session['marital_status'] = form.maritalStatus.data
-            session['spouse_name'] = form.spouseName.data
-            session['is_spouse_G_grad'] = form.spouseGenevaGrad.data
-            session['spouse_geneva_degree'] = form.spouseGenevaDegree.data
-            session['spouse_undergrad_year'] = form.spouseUndergradYear.data
-            session['spouse_graduate_year'] = form.spouseGraduateYear.data
-            session['spouse_online_year'] = form.spouseOnlineYear.data
-            session['marry_date'] = form.marryDate.data
-            
+            session['marital_status'] = form.marital_status.data
+            session['spouse_name'] = form.spouse_name.data
+            session['spouse_geneva_grad'] = form.spouse_geneva_grad.data
+            session['spouse_geneva_degrees'] = form.spouse_geneva_degrees.data
+            session['spouse_undergrad_year'] = form.spouse_undergrad_year.data
+            session['spouse_graduate_year'] = form.spouse_graduate_year.data
+            session['spouse_online_year'] = form.spouse_online_year.data
+            session['marry_date'] = form.marry_date.data
+
             return navigate_update("Family Update", "next")
             
         elif nav == 'prev':
@@ -224,72 +230,68 @@ def form_family():
         
     # Prepopulate form from session if available
     if request.method == 'GET':
-        form.maritalStatus.data = session.get('marital_status')
-        form.spouseName.data = session.get('spouse_name')
-        form.spouseGenevaGrad.data = session.get('is_spouse_G_grad')
-        form.spouseGenevaDegree.data = session.get('spouse_geneva_degree')
-        form.spouseUndergradYear.data = session.get('spouse_undergrad_year')
-        form.spouseGraduateYear.data = session.get('spouse_graduate_year')
-        form.spouseOnlineYear.data = session.get('spouse_online_year')
+        form.marital_status.data = session.get('marital_status')
+        form.spouse_name.data = session.get('spouse_name')
+        form.spouse_geneva_grad.data = session.get('spouse_geneva_grad')
+        form.spouse_geneva_degrees.data = session.get('spouse_geneva_degrees')
+        form.spouse_undergrad_year.data = session.get('spouse_undergrad_year')
+        form.spouse_graduate_year.data = session.get('spouse_graduate_year')
+        form.spouse_online_year.data = session.get('spouse_online_year')
         marry_date = session.get('marry_date')
-        form.marryDate.data = parse_session_date(marry_date)
+        form.marry_date.data = parse_session_date(marry_date)
         
     return render_template('forms/family.html', form=form)    
             
-@form_bp.route('/AlumniChildren', methods=['GET', 'POST'])
-def form_AlumniChildren():
-    form = AlumniChildrenForm()
-    
-    if request.method == 'POST':
-        if 'add_AlumniChild' in request.form:
-            form.AlumniChildren.append_entry()
-            return render_template('forms/AlumniChildren.html', form=form)
+@form_bp.route('/children', methods=['GET', 'POST'])
+def form_children():
+    form = ChildrenForm()
 
-        if 'remove_AlumniChild' in request.form:
-            index_to_remove = int(request.form['remove_AlumniChild'])
-            if len(form.AlumniChildren.entries) > 1:
-                form.AlumniChildren.entries.pop(index_to_remove)
-            return render_template('forms/AlumniChildren.html', form=form)
-        
+    if request.method == 'POST':
+        if 'add_child' in request.form:
+            form.children.append_entry()
+            return render_template('forms/children.html', form=form)
+
+        if 'remove_child' in request.form:
+            index_to_remove = int(request.form['remove_child'])
+            if len(form.children.entries) > 1:
+                form.children.entries.pop(index_to_remove)
+            return render_template('forms/children.html', form=form)
+
         nav = request.form.get('nav')  # 'next' or 'prev'
-        if nav =='next' and form.validate_on_submit():
-            session['AlumniChildren'] = []
-            for AlumniChild_form in form.AlumniChildren:
-                session['AlumniChildren'].append({
-                    'first_name': AlumniChild_form.AlumniChildsFirstName.data,
-                    'last_name': AlumniChild_form.AlumniChildsLastName.data,
-                    'gender': AlumniChild_form.AlumniChildGender.data,
-                    'birthday': AlumniChild_form.AlumniChildsBirthday.data,
+        if nav == 'next' and form.validate_on_submit():
+            session['children'] = []
+            for child_form in form.children:
+                session['children'].append({
+                    'first_name': child_form.first_name.data,
+                    'last_name': child_form.last_name.data,
+                    'gender': child_form.gender.data,
+                    'birthday': child_form.birthday.data,
                 })
-                
-            return navigate_update("Birth Announcement", "next")
-            
+
+            return navigate_update("Birth Announcement(s)", "next")
+
         elif nav == 'prev':
-            return navigate_update("Birth Announcement", "prev")
-        
-    # Prepopulate form from session if available            
+            return navigate_update("Birth Announcement(s)", "prev")
+
+    # Prepopulate form from session if available
     if request.method == 'GET':
-        # AlumniChildren: clear existing, then repopulate
-        form.AlumniChildren.entries = []
-        AlumniChildren_data = session.get('AlumniChildren', [])
-        for AlumniChild in AlumniChildren_data:
-            birthday = AlumniChild.get('birthday')
+        form.children.entries = []
+        children_data = session.get('children', [])
+        for child in children_data:
+            birthday = child.get('birthday')
             if birthday:
-                birthday = parse_session_date(AlumniChild.get("birthday"))
-            else:
-                birthday = None
-            form.AlumniChildren.append_entry({
-                'AlumniChildsFirstName': AlumniChild.get('first_name'),
-                'AlumniChildsLastName': AlumniChild.get('last_name'),
-                'AlumniChildGender': AlumniChild.get('gender'),
-                'AlumniChildsBirthday': birthday,
+                birthday = parse_session_date(birthday)
+            form.children.append_entry({
+                'first_name': child.get('first_name'),
+                'last_name': child.get('last_name'),
+                'gender': child.get('gender'),
+                'birthday': birthday,
             })
 
-        # Always ensure at least one entry
-        if not form.AlumniChildren.entries:
-            form.AlumniChildren.append_entry()            
-        
-    return render_template('forms/AlumniChildren.html', form=form) 
+        if not form.children.entries:
+            form.children.append_entry()
+
+    return render_template('forms/children.html', form=form)
 
             
 @form_bp.route('/employment', methods=['GET', 'POST'])
@@ -301,8 +303,8 @@ def form_employment():
         if nav == 'next' and form.validate_on_submit():
             session['employer'] = form.employer.data
             session['position'] = form.position.data
-            session['start_date'] = form.startDate.data
-            
+            session['start_date'] = form.start_date.data
+
             return navigate_update("Employment Update", "next")
             
         elif nav == 'prev':
@@ -312,9 +314,8 @@ def form_employment():
     if request.method == 'GET':  
         form.employer.data = session.get('employer')
         form.position.data = session.get('position')
-        form.startDate.data = session.get('start_date')  
         start_date = session.get('start_date')
-        form.startDate.data = parse_session_date(start_date)                      
+        form.start_date.data = parse_session_date(start_date)                      
         
     return render_template('forms/employment.html', form=form)
             
@@ -325,10 +326,10 @@ def form_education():
     if request.method == 'POST':
         nav = request.form.get('nav')  # 'next' or 'prev'
         if nav == 'next' and form.validate_on_submit():
-            session['non_g_education'] = form.nonGEducation.data
-            session['non_g_degree'] = form.nonGEducationDegree.data
-            session['non_g_grad_year'] = form.nonGEducationGradYear.data
-            
+            session['education_institution'] = form.institution.data
+            session['education_degree'] = form.degree.data
+            session['education_graduation_year'] = form.graduation_year.data
+
             return navigate_update("Additional Education", "next")   
         
         elif nav == 'prev':
@@ -336,13 +337,16 @@ def form_education():
         
     # Prepopulate form from session if available            
     if request.method == 'GET':  
-        form.nonGEducation.data = session.get('non_g_education')
-        form.nonGEducationDegree.data = session.get('non_g_degree')
-        form.nonGEducationGradYear.data = session.get('non_g_grad_year')  
-        non_g_grad_year = session.get('non_g_grad_year')
+        form.institution.data = session.get('education_institution')
+        form.degree.data = session.get('education_degree')
+        form.graduation_year.data = session.get('education_graduation_year')
+        non_g_grad_year = session.get('education_graduation_year')
         if non_g_grad_year:
-            form.nonGEducationGradYear.data = datetime.strptime(non_g_grad_year, '%Y').date()                       
-        
+            try:
+                form.graduation_year.data = non_g_grad_year
+            except Exception:
+                pass
+
         return render_template('forms/education.html', form=form)       
             
 @form_bp.route('/achievements', methods=['GET', 'POST'])
@@ -352,7 +356,7 @@ def form_achievement():
     if request.method == 'POST':
         nav = request.form.get('nav')  # 'next' or 'prev'
         if nav == 'next' and form.validate_on_submit(): 
-            session['additional_updates'] = form.additionalUpdates.data
+            session['additional_updates'] = form.additional_updates.data
             
             return navigate_update("Life Achievements", "next")   
         
@@ -361,7 +365,7 @@ def form_achievement():
         
     # Prepopulate form from session if available            
     if request.method == 'GET':  
-        form.additionalUpdates.data = session.get('additional_updates')
+        form.additional_updates.data = session.get('additional_updates')
         
         return render_template('forms/achievements.html', form=form)
             
@@ -373,9 +377,9 @@ def form_volunteer():
         nav = request.form.get('nav')
 
         if nav == 'next' and form.validate_on_submit():
-            session['volunteer_radio'] = form.volunteerRadio.data
-            session['volunteer_choices'] = form.volunteerChoices.data or []
-            session['other_volunteer_text'] = form.otherVolunteer.data or ""
+            session['volunteer_radio'] = form.volunteer_radio.data
+            session['volunteer_choices'] = form.volunteer_choices.data or []
+            session['other_volunteer'] = form.other_volunteer.data or ""
             return redirect(url_for("form.form_final_review"))
 
         elif nav == 'prev':
@@ -384,19 +388,19 @@ def form_volunteer():
             return redirect(last_selected_update_url())
         
     if request.method == 'GET':
-        form.volunteerRadio.data = session.get('volunteer_radio')
-        form.volunteerChoices.data = session.get('volunteer_choices', [])
-        form.otherVolunteer.data = session.get('other_volunteer_text', "")    
+        form.volunteer_radio.data = session.get('volunteer_radio')
+        form.volunteer_choices.data = session.get('volunteer_choices', [])
+        form.other_volunteer.data = session.get('other_volunteer', "")    
         
     return render_template('forms/volunteer.html', form=form) 
             
 @form_bp.route('/class-note', methods=['GET', 'POST'])
-def form_AlumniClassNote():
-    form = AlumniClassNoteForm()
-    
+def form_class_note():
+    form = ClassNoteForm()
+
     if request.method == 'POST' and form.validate_on_submit():
         # Always save class note to session before navigation
-        session['class_note'] = form.AlumniClassNote.data
+        session['class_note_text'] = form.class_note_text.data
 
         # Save base64-encoded image (if provided)
         resized_image = request.form.get('resized_image')
@@ -436,20 +440,20 @@ def form_AlumniClassNote():
     # === GET Request ===
     elif request.method == 'GET':
         # Pre-fill class note from session
-        form.AlumniClassNote.data = session.get('class_note')
-        
+        form.class_note_text.data = session.get('class_note_text')
+
         uploaded_filename = session.get('uploaded_image_filename')
         if uploaded_filename:
             upload_folder = current_app.config.get('UPLOAD_FOLDER', 'static/uploads')
             image_url = url_for('static', filename=f'uploads/{uploaded_filename}')
         else:
             image_url = None
-            
+
         return render_template('forms/class-note.html', form=form, image_url=image_url)
 
     # === Validation error (length, etc.) ===
-    if form.AlumniClassNote.errors:
-        for error in form.AlumniClassNote.errors:
+    if form.class_note_text.errors:
+        for error in form.class_note_text.errors:
             if "too long" in error.lower():
                 flash(error, "warning")
 
@@ -480,7 +484,7 @@ def build_review_sections(session_data):
         "ODP": session_data.get("online_year"),
     }
 
-    selected_degrees = session_data.get("geneva_degree") or []
+    selected_degrees = session_data.get("geneva_degrees") or []
 
     for degree in selected_degrees:
         year = degree_year_map.get(degree)
@@ -503,14 +507,14 @@ def build_review_sections(session_data):
         "ODP": session_data.get("spouse_online_year"),
     }
 
-    spouse_selected_degrees = session_data.get("spouse_geneva_degree") or []
+    spouse_selected_degrees = session_data.get("spouse_geneva_degrees") or []
 
     for degree in spouse_selected_degrees:
         year = spouse_degree_year_map.get(degree)
         if year:
             spouse_degree_rows.append({
                 "degree": degree_label_map.get(degree, degree),
-                "year": degree_year_map.get(degree, "")
+                "year": spouse_degree_year_map.get(degree, "")
             })
         else:
             spouse_degree_rows.append({
@@ -550,7 +554,7 @@ def build_review_sections(session_data):
         {
             "title": "Birth Announcement(s)",
             "fields": [
-                ("Birth Announcements", session_data.get("AlumniChildren")),
+                ("Birth Announcements", session_data.get("children")),
             ],
         },
         {
@@ -573,9 +577,9 @@ def build_review_sections(session_data):
         {
             "title": "Additional Education",
             "fields": [
-                ("Institution", session_data.get("non_g_education")),
-                ("Degree", session_data.get("non_g_degree")),
-                ("Graduation Year", session_data.get("non_g_grad_year")),
+                ("Institution", session_data.get("education_institution")),
+                ("Degree", session_data.get("education_degree")),
+                ("Graduation Year", session_data.get("education_graduation_year")),
             ],
         },
         {
@@ -587,7 +591,7 @@ def build_review_sections(session_data):
         {
             "title": "Class Note",
             "fields": [
-                ("Class Note", session_data.get("class_note")),
+                ("Class Note", session_data.get("class_note_text")),
                 ("Uploaded Image", session_data.get("uploaded_image_filename")),
             ],
         },
@@ -596,7 +600,7 @@ def build_review_sections(session_data):
             "fields": [
                 ("Interest", session_data.get("volunteer_radio")),
                 ("Volunteer Opportunities", session_data.get("volunteer_choices")),
-                ("Other Volunteer Idea", session_data.get("other_volunteer_text")),
+                ("Other Volunteer Idea", session_data.get("other_volunteer")),
             ],
         },
     ]
@@ -626,8 +630,8 @@ def form_final_review():
     form = FinalSubmitForm()
     
     review_sections = build_review_sections(session)
-    AlumniChildren = session.get("AlumniChildren") or []
-    noteFlag = session.get("class_note_option") # 'Yes' or 'No'
+    children = session.get("children") or []
+    noteFlag = session.get("wants_class_note") # 'Yes' or 'No'
 
     if request.method == 'POST':
         nav = request.form.get('nav')  # 'next' or 'prev'
@@ -637,7 +641,7 @@ def form_final_review():
         elif nav == 'prev':
             return redirect(url_for("form.form_step1"))
         
-    return render_template('forms/review.html', review_sections=review_sections, noteFlag=noteFlag, AlumniChildren=AlumniChildren, form=form) 
+    return render_template('forms/review.html', review_sections=review_sections, noteFlag=noteFlag, AlumniChildren=children, form=form) 
 
 @form_bp.route('/submit-final', methods=['GET', 'POST'])
 def submit_final():
@@ -645,71 +649,122 @@ def submit_final():
         return redirect(url_for("form.form_final_review"))
 
     try:
-        note = AlumniClassNote(
+        # Create normalized objects
+        alumnus = Alumni(
             first_name=session.get("first_name"),
             last_name=session.get("last_name"),
             maiden_name=session.get("maiden_name"),
-
-            geneva_degree=session.get("geneva_degree"),
-            undergrad_year=session.get("undergrad_year"),
-            graduate_year=session.get("graduate_year"),
-            online_year=session.get("online_year"),
-
-            update_types=", ".join(session.get("update_types", [])),
-            class_note_option=session.get("class_note_option") == "Yes",
-
             pref_salutation=session.get("pref_salutation"),
             email=session.get("email"),
             phone=session.get("phone"),
-            Phone_type=session.get("phone_type"),
+            phone_type=PhoneType(session.get("phone_type")) if session.get("phone_type") else None,
+        )
 
+        db.session.add(alumnus)
+        db.session.flush()
+
+        # Address
+        address = AlumniAddress(
+            alumnus_id=alumnus.id,
             address_line1=session.get("address_line1"),
             address_line2=session.get("address_line2"),
             city=session.get("city"),
             state=session.get("state"),
             postal_code=session.get("postal_code"),
             country=session.get("country"),
-
-            marital_status=session.get("marital_status"),
-            spouse_name=session.get("spouse_name"),
-            is_spouse_G_grad=session.get("is_spouse_G_grad") == "Yes",
-            spouse_geneva_degree=session.get("spouse_geneva_degree"),
-            spouse_undergrad_year=session.get("spouse_undergrad_year"),
-            spouse_graduate_year=session.get("spouse_graduate_year"),
-            spouse_online_year=session.get("spouse_online_year"),
-            marry_date=parse_session_date(session.get("marry_date")),
-
-            employer=session.get("employer"),
-            position=session.get("position"),
-            start_date=parse_session_date(session.get("start_date")),
-
-            non_g_education=session.get("non_g_education"),
-            non_g_degree=session.get("non_g_degree"),
-            non_g_grad_year=session.get("non_g_grad_year"),
-
-            additional_updates=session.get("additional_updates"),
-
-            volunteer_radio=session.get("volunteer_radio") == "Yes",
-            volunteer_choices=", ".join(session.get("volunteer_choices", [])),
-            other_volunteer=session.get("other_volunteer_text"),
-
-            class_note_text=session.get("class_note"),
         )
+        db.session.add(address)
 
-        db.session.add(note)
+        # Update
+        alumni_update = AlumniUpdate(
+            alumnus_id=alumnus.id,
+            update_types=session.get("update_types", []),
+            wants_class_note=(session.get("wants_class_note") == "Yes"),
+            additional_updates=session.get("additional_updates"),
+            volunteer_radio=(session.get("volunteer_radio") == "Yes"),
+            volunteer_choices=session.get("volunteer_choices", []),
+            other_volunteer=session.get("other_volunteer"),
+        )
+        db.session.add(alumni_update)
         db.session.flush()
 
-        for AlumniChild_data in session.get("AlumniChildren", []):
-            AlumniChild = AlumniChild(
-                first_name=AlumniChild_data.get("first_name"),
-                last_name=AlumniChild_data.get("last_name"),
-                gender=AlumniChild_data.get("gender"),
-                birthday=parse_session_date(AlumniChild_data.get("birthday"))
-            )
-            note.AlumniChildren.append(AlumniChild)
+        # Geneva educations
+        for deg in session.get("geneva_degrees", []):
+            year = None
+            if deg == "TUG":
+                year = session.get("undergrad_year")
+            elif deg == "Grad":
+                year = session.get("graduate_year")
+            elif deg == "ODP":
+                year = session.get("online_year")
 
+            g = AlumniGenevaEducation(
+                alumnus_id=alumnus.id,
+                degree_level=deg,
+                degree=deg,
+                graduation_year=year,
+            )
+            db.session.add(g)
+
+        # Family update
+        if any([session.get("marital_status"), session.get("spouse_name"), session.get("spouse_geneva_degrees")]):
+            fam = AlumniFamilyUpdate(
+                alumni_update_id=alumni_update.id,
+                marital_status=session.get("marital_status"),
+                spouse_name=session.get("spouse_name"),
+                is_spouse_geneva_grad=(session.get("spouse_geneva_grad") == "Yes"),
+                spouse_geneva_degrees=session.get("spouse_geneva_degrees"),
+                spouse_undergrad_year=session.get("spouse_undergrad_year"),
+                spouse_graduate_year=session.get("spouse_graduate_year"),
+                spouse_online_year=session.get("spouse_online_year"),
+                marry_date=parse_session_date(session.get("marry_date")),
+            )
+            db.session.add(fam)
+
+        # Children
+        for child_data in session.get("children", []):
+            child = AlumniChild(
+                alumni_update_id=alumni_update.id,
+                first_name=child_data.get("first_name"),
+                last_name=child_data.get("last_name"),
+                gender=child_data.get("gender"),
+                birthday=parse_session_date(child_data.get("birthday")),
+            )
+            db.session.add(child)
+
+        # Employment
+        if session.get("employer"):
+            emp = AlumniEmploymentUpdate(
+                alumni_update_id=alumni_update.id,
+                employer=session.get("employer"),
+                position=session.get("position"),
+                start_date=parse_session_date(session.get("start_date")),
+            )
+            db.session.add(emp)
+
+        # Education
+        if session.get("education_institution"):
+            edu = AlumniEducationUpdate(
+                alumni_update_id=alumni_update.id,
+                institution=session.get("education_institution"),
+                degree=session.get("education_degree"),
+                graduation_year=session.get("education_graduation_year"),
+            )
+            db.session.add(edu)
+
+        # Class note
+        class_note_obj = None
+        if session.get("wants_class_note") == "Yes":
+            class_note_obj = AlumniClassNote(
+                alumni_update_id=alumni_update.id,
+                class_note_text=session.get("class_note_text"),
+            )
+            db.session.add(class_note_obj)
+            db.session.flush()
+
+        # Handle uploaded image renaming for class note
         temp_filename = session.get("uploaded_image_filename")
-        if temp_filename:
+        if temp_filename and class_note_obj:
             upload_folder = current_app.config.get("UPLOAD_FOLDER", "static/uploads")
             abs_upload_folder = os.path.join(current_app.root_path, upload_folder)
             os.makedirs(abs_upload_folder, exist_ok=True)
@@ -717,10 +772,10 @@ def submit_final():
             old_path = os.path.join(abs_upload_folder, temp_filename)
 
             if os.path.exists(old_path):
-                new_filename = build_image_filename(note, original_filename=temp_filename)
+                new_filename = build_image_filename(class_note_obj, original_filename=temp_filename)
                 new_path = os.path.join(abs_upload_folder, new_filename)
                 os.rename(old_path, new_path)
-                note.image_filename = new_filename
+                class_note_obj.image_filename = new_filename
 
         db.session.commit()
 

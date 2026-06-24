@@ -13,7 +13,7 @@
     <p class="form-note"><span class="required-asterisk">*</span> Required fields</p>
 
   {% for field in [
-     form.firstName, form.lastName, form.maidenName
+      form.first_name, form.last_name, form.maiden_name
   ] %}
     <div class="field">
       <label class="form-label" for="{{ field.id }}">
@@ -37,11 +37,11 @@
 
   <div class="field">
   <label class="form-label">
-    {{ form.genevaDegree.label }}
+    {{ form.geneva_degrees.label }}
     <span class="required-asterisk">*</span>
   </label>
 
-  {% for option in form.genevaDegree %}
+  {% for option in form.geneva_degrees %}
   <div class="geneva-degree-row">
     <div class="geneva-degree-option">
       {{ option(class="form-checkbox", id=option.id) }}
@@ -51,17 +51,17 @@
     <div class="geneva-degree-year">
       {% if option._value() == "TUG" %}
         <div id="undergrad-wrapper" style="display:none;">
-          {{ form.undergradYear(class="form-input", placeholder="Grad Year") }}
+          {{ form.undergrad_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
       {% elif option._value() == "Grad" %}
         <div id="graduate-wrapper" style="display:none;">
-          {{ form.graduateYear(class="form-input", placeholder="Grad Year") }}
+          {{ form.graduate_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
       {% elif option._value() == "ODP" %}
         <div id="online-wrapper" style="display:none;">
-          {{ form.onlineYear(class="form-input", placeholder="Grad Year") }}
+          {{ form.online_year(class="form-input", placeholder="Grad Year") }}
         </div>
       {% endif %}
     </div>
@@ -70,8 +70,8 @@
 
   <h2>Choose Your Update(s)</h2>
   <div class="field">
-  <label class="form-label">{{ form.updateSelector.label }} <span class="required-asterisk">*</span></label>
-  {% for option in form.updateSelector %}
+  <label class="form-label">{{ form.update_types.label }} <span class="required-asterisk">*</span></label>
+  {% for option in form.update_types %}
     <div class="form-checkbox-row">
       {{ option(class="form-checkbox", id=option.id) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>
@@ -83,8 +83,8 @@
 <p class="form-note">Share your news with the Geneva community! Class Notes are featured online and in the <i>Geneva Magazine</i>, helping alumni and friends stay connected through life updates, milestones, and accomplishments. To ensure consistency and readability, submissions may be edited for grammar, style, and clarity.</p>
 <div class="field">
   <label class="form-label">
-    {{ form.AlumniClassNote.label }} <span class="required-asterisk">*</span></label>
-    {% for option in form.AlumniClassNote %}
+    {{ form.wants_class_note.label }} <span class="required-asterisk">*</span></label>
+    {% for option in form.wants_class_note %}
     <div class="form-checkbox-row">
       {{ option(class="form-checkbox", id=option.id) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>

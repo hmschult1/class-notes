@@ -3,7 +3,7 @@
 {% block title %}Geneva College Alumni Update{% endblock %}
 
 {% block content %}
-<form id="step3" method="POST" action="{{ url_for('form.form_AlumniClassNote') }}">
+<form id="step3" method="POST" action="{{ url_for('form.form_class_note') }}" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
   <h1 style="text-align: center">Publish a Class Note</h1>
@@ -14,8 +14,8 @@
   </p>
 
   <div class="field">
-    {{ form.AlumniClassNote(class="form-input form-textarea", placeholder="Please enter your class note in third person") }}
-    {% for error in form.AlumniClassNote.errors %}
+    {{ form.class_note_text(class="form-input form-textarea", placeholder="Please enter your class note in third person") }}
+    {% for error in form.class_note_text.errors %}
     <div class="text-danger">{{ error }}</div>
     {% endfor %}
   </div>

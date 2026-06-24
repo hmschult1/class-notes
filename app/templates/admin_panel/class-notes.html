@@ -21,26 +21,36 @@
         {% for entry in entries %}
         <tr data-id="{{ entry.id }}">
           <td class="cell-new">
-            {% if entry.viewed == False %}
+            {% if entry.alumni_update and entry.alumni_update.viewed == False %}
             🔴
             {% endif %}
           </td>
-          <td class="cell-name">{{ entry.first_name }} {{ entry.last_name }}</td>
+          <td class="cell-name">{{ entry.alumni_update.alumnus.first_name }} {{ entry.alumni_update.alumnus.last_name }}</td>
           <td class="cell-note">{{ entry.class_note_text[:20] }}</td>
-          <td class="cell-date">{{ entry.submitted_at.strftime('%Y-%m-%d') }}</td>
+          <td class="cell-date">{{ entry.alumni_update.submitted_at.strftime('%Y-%m-%d') if entry.alumni_update and entry.alumni_update.submitted_at else '' }}</td>
           <td class="cell-actions">
-            <a href="#" class="edit-link" data-id="{{ entry.id }}" data-first="{{ entry.first_name }}"
-              data-last="{{ entry.last_name }}" data-maiden="{{ entry.maiden_name }}" data-email="{{ entry.email }}"
-              data-phone="{{ entry.phone }}" data-gradyear="{{ entry.grad_year }}"
-              data-address1="{{ entry.address_line1 }}" data-address2="{{ entry.address_line2 }}"
-              data-city="{{ entry.city }}" data-state="{{ entry.state }}" data-zip="{{ entry.postal_code }}"
-              data-country="{{ entry.country }}" data-marital="{{ entry.marital_status }}"
-              data-spouse="{{ entry.spouse_name }}" data-spouseyear="{{ entry.spouse_grad_year }}"
-              data-marrydate="{{ entry.marry_date.strftime('%Y-%m-%d') if entry.marry_date else '' }}"
-              data-employer="{{ entry.employer }}" data-position="{{ entry.position }}"
-              data-education="{{ entry.non_g_education }}" data-updates="{{ entry.additional_updates }}"
-              data-volunteer="{{ entry.volunteer_opportunities }}" data-othervolunteer="{{ entry.other_volunteer }}"
-              data-note="{{ entry.class_note_text|e }}" data-image="{{ entry.image_filename or '' }}">
+            <a href="#" class="edit-link" data-id="{{ entry.id }}" 
+              data-dfirst="{{ entry.alumni_update.alumnus.first_name }}"
+              data-dlast="{{ entry.alumni_update.alumnus.last_name }}" 
+              data-dmaiden="{{ entry.alumni_update.alumnus.maiden_name }}" 
+              data-demail="{{ entry.alumni_update.alumnus.email }}"
+              data-dphone="{{ entry.alumni_update.alumnus.phone }}"
+              data-daddress1="{{ entry.alumni_update.alumnus.addresses[0].address_line1 if entry.alumni_update.alumnus.addresses else '' }}"
+              data-daddress2="{{ entry.alumni_update.alumnus.addresses[0].address_line2 if entry.alumni_update.alumnus.addresses else '' }}"
+              data-dcity="{{ entry.alumni_update.alumnus.addresses[0].city if entry.alumni_update.alumnus.addresses else '' }}"
+              data-dstate="{{ entry.alumni_update.alumnus.addresses[0].state if entry.alumni_update.alumnus.addresses else '' }}"
+              data-dzip="{{ entry.alumni_update.alumnus.addresses[0].postal_code if entry.alumni_update.alumnus.addresses else '' }}"
+              data-dcountry="{{ entry.alumni_update.alumnus.addresses[0].country if entry.alumni_update.alumnus.addresses else '' }}"
+              data-dmarital="{{ entry.alumni_update.family_update.marital_status if entry.alumni_update.family_update else '' }}"
+              data-dspouse="{{ entry.alumni_update.family_update.spouse_name if entry.alumni_update.family_update else '' }}"
+              data-dmarrydate="{{ entry.alumni_update.family_update.marry_date.strftime('%Y-%m-%d') if entry.alumni_update.family_update and entry.alumni_update.family_update.marry_date else '' }}"
+              data-demployer="{{ entry.alumni_update.employment_updates[0].employer if entry.alumni_update.employment_updates else '' }}"
+              data-dposition="{{ entry.alumni_update.employment_updates[0].position if entry.alumni_update.employment_updates else '' }}"
+              data-deducation="{{ entry.alumni_update.education_updates[0].institution if entry.alumni_update.education_updates else '' }}"
+              data-dupdates="{{ entry.alumni_update.additional_updates }}"
+              data-dvolunteer="{{ entry.alumni_update.volunteer_choices | join(', ') if entry.alumni_update and entry.alumni_update.volunteer_choices else '' }}"
+              data-dother="{{ entry.alumni_update.other_volunteer }}"
+              data-dnote="{{ entry.class_note_text|e }}" data-dimage="{{ entry.image_filename or '' }}">
               Edit
             </a>
 
@@ -75,18 +85,18 @@
           <input type="hidden" name="note_id" id="note_id" />
 
           <div class="mb-3">
-            <strong>{{ form.firstName.label }}</strong>
-            {{ form.firstName(id="firstName", class="form-control") }}
+            <strong>{{ form.first_name.label }}</strong>
+            {{ form.first_name(id="first_name", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.lastName.label }}</strong>
-            {{ form.lastName(id="lastName", class="form-control") }}
+            <strong>{{ form.last_name.label }}</strong>
+            {{ form.last_name(id="last_name", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.maidenName.label }}</strong>
-            {{ form.maidenName(id="maidenName", class="form-control") }}
+            <strong>{{ form.maiden_name.label }}</strong>
+            {{ form.maiden_name(id="maiden_name", class="form-control") }}
           </div>
 
           <div class="mb-3">
@@ -100,18 +110,13 @@
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.gradYear.label }}</strong>
-            {{ form.gradYear(id="gradYear", class="form-control") }}
+            <strong>{{ form.address_line1.label }}</strong>
+            {{ form.address_line1(id="address_line1", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.addressLine1.label }}</strong>
-            {{ form.addressLine1(id="addressLine1", class="form-control") }}
-          </div>
-
-          <div class="mb-3">
-            <strong>{{ form.addressLine2.label }}</strong>
-            {{ form.addressLine2(id="addressLine2", class="form-control") }}
+            <strong>{{ form.address_line2.label }}</strong>
+            {{ form.address_line2(id="address_line2", class="form-control") }}
           </div>
 
           <div class="mb-3">
@@ -125,8 +130,8 @@
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.postalCode.label }}</strong>
-            {{ form.postalCode(id="postalCode", class="form-control") }}
+            <strong>{{ form.postal_code.label }}</strong>
+            {{ form.postal_code(id="postal_code", class="form-control") }}
           </div>
 
           <div class="mb-3">
@@ -135,40 +140,35 @@
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.maritalStatus.label }}</strong>
-            {{ form.maritalStatus(id="maritalStatus", class="form-control") }}
+            <strong>{{ form.marital_status.label }}</strong>
+            {{ form.marital_status(id="marital_status", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.spouseName.label }}</strong>
-            {{ form.spouseName(id="spouseName", class="form-control") }}
+            <strong>{{ form.spouse_name.label }}</strong>
+            {{ form.spouse_name(id="spouse_name", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.spouseGradYear.label }}</strong>
-            {{ form.spouseGradYear(id="spouseGradYear", class="form-control") }}
+            <strong>{{ form.marry_date.label }}</strong>
+            {{ form.marry_date(id="marry_date", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.marryDate.label }}</strong>
-            {{ form.marryDate(id="marryDate", class="form-control") }}
-          </div>
-
-          <div class="mb-3">
-            <strong>{{ form.AlumniChildsFirstName.label }}</strong>
-            {{ form.AlumniChildsFirstName(id="AlumniChildsFirstName", class="form-control") }}
+            <strong>{{ form.first_name.label }}</strong>
+            {{ form.first_name(id="child_first_name", class="form-control") }}
           </div>
           <div class="mb-3">
-            <strong>{{ form.AlumniChildsLastName.label }}</strong>
-            {{ form.AlumniChildsLastName(id="AlumniChildsLastName", class="form-control") }}
+            <strong>{{ form.last_name.label }}</strong>
+            {{ form.last_name(id="child_last_name", class="form-control") }}
           </div>
           <div class="mb-3">
-            <strong>{{ form.AlumniChildsGender.label }}</strong>
-            {{ form.AlumniChildsGender(id="AlumniChildsGender") }}
+            <strong>Child Gender</strong>
+            <input id="child_gender" class="form-control" />
           </div>
           <div class="mb-3">
-            <strong>{{ form.AlumniChildsBirthday.label }}</strong>
-            {{ form.AlumniChildsBirthday(id="AlumniChildsBirthday", class="form-control") }}
+            <strong>Child Birthday</strong>
+            <input id="child_birthday" class="form-control" />
           </div>
 
           <div class="mb-3">
@@ -182,28 +182,28 @@
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.nonGEducation.label }}</strong>
-            {{ form.nonGEducation(id="nonGEducation", class="form-control") }}
+            <strong>{{ form.institution.label }}</strong>
+            {{ form.institution(id="institution", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.additionalUpdates.label }}</strong>
-            {{ form.additionalUpdates(id="additionalUpdates", class="form-control") }}
+            <strong>{{ form.additional_updates.label }}</strong>
+            {{ form.additional_updates(id="additional_updates", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.volunteerChoices.label }}</strong>
-            {{ form.volunteerChoices(id="volunteerChoices") }}
+            <strong>{{ form.volunteer_choices.label }}</strong>
+            {{ form.volunteer_choices(id="volunteer_choices") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.otherVolunteer.label }}</strong>
-            {{ form.otherVolunteer(id="otherVolunteer", class="form-control") }}
+            <strong>{{ form.other_volunteer.label }}</strong>
+            {{ form.other_volunteer(id="other_volunteer", class="form-control") }}
           </div>
 
           <div class="mb-3">
-            <strong>{{ form.AlumniClassNote.label }}</strong>
-            {{ form.AlumniClassNote(id="AlumniClassNote", class="form-control") }}
+            <strong>{{ form.class_note_text.label }}</strong>
+            {{ form.class_note_text(id="class_note_text", class="form-control") }}
           </div>
 
           <!-- Image block -->
@@ -237,32 +237,29 @@
       link.addEventListener('click', function (event) {
         event.preventDefault();
 
-        // Use camelCase IDs to match WTForms fields in the modal
+        // Map data attributes (data-d*) to modal input IDs (snake_case)
         const mapping = {
-          id: 'note_id',
-          first: 'firstName',
-          last: 'lastName',
-          maiden: 'maidenName',
-          email: 'email',
-          phone: 'phone',
-          gradyear: 'gradYear',
-          address1: 'addressLine1',
-          address2: 'addressLine2',
-          city: 'city',
-          state: 'state',
-          zip: 'postalCode',
-          country: 'country',
-          marital: 'maritalStatus',
-          spouse: 'spouseName',
-          spouseyear: 'spouseGradYear',
-          marrydate: 'marryDate',
-          employer: 'employer',
-          position: 'position',
-          education: 'nonGEducation',
-          updates: 'additionalUpdates',
-          // volunteer: 'volunteerChoices',
-          othervolunteer: 'otherVolunteer',
-          note: 'AlumniClassNote'
+          dfirst: 'first_name',
+          dlast: 'last_name',
+          dmaiden: 'maiden_name',
+          demail: 'email',
+          dphone: 'phone',
+          daddress1: 'address_line1',
+          daddress2: 'address_line2',
+          dcity: 'city',
+          dstate: 'state',
+          dzip: 'postal_code',
+          dcountry: 'country',
+          dmarital: 'marital_status',
+          dspouse: 'spouse_name',
+          dmarrydate: 'marry_date',
+          demployer: 'employer',
+          dposition: 'position',
+          deducation: 'institution',
+          dupdates: 'additional_updates',
+          dother: 'other_volunteer',
+          dnote: 'class_note_text',
+          id: 'note_id'
         };
 
         // Populate all the text/textarea/select inputs
@@ -279,20 +276,20 @@
           }
         }
 
-        // data-volunteer might be "Admissions, Speaker, Other"
-        const volunteerRaw = this.dataset.volunteer || '';
+        // data-dvolunteer might be "Admissions, Speaker, Other"
+        const volunteerRaw = this.dataset.dvolunteer || '';
         const selectedValues = volunteerRaw
           .split(',')
           .map(v => v.trim())
           .filter(v => v.length > 0);
 
-        // Uncheck all boxes first
-        document.querySelectorAll('input[name="volunteerChoices"]').forEach(cb => {
+        // Uncheck all volunteer boxes first
+        document.querySelectorAll('input[name="volunteer_choices"]').forEach(cb => {
           cb.checked = false;
         });
 
         // Check boxes whose value is in selectedValues
-        document.querySelectorAll('input[name="volunteerChoices"]').forEach(cb => {
+        document.querySelectorAll('input[name="volunteer_choices"]').forEach(cb => {
           if (selectedValues.includes(cb.value)) {
             cb.checked = true;
           }

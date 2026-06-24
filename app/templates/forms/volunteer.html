@@ -13,8 +13,8 @@
 </p>
 
 <div class="field">
-  <label class="form-label">{{ form.volunteerRadio.label }}</label>
-  {% for option in form.volunteerRadio %}
+  <label class="form-label">{{ form.volunteer_radio.label }}</label>
+  {% for option in form.volunteer_radio %}
     <div class="form-checkbox-row">
       {{ option(class="form-checkbox", id=option.id) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>
@@ -22,9 +22,9 @@
   {% endfor %}
 </div>
 
-  <div class="field" id="volunteerOptionsContainer" style="display: none;">
-  <label class="form-label">{{ form.volunteerChoices.label }}</label>
-  {% for option in form.volunteerChoices %}
+  <div class="field" id="volunteer_options_container" style="display: none;">
+  <label class="form-label">{{ form.volunteer_choices.label }}</label>
+  {% for option in form.volunteer_choices %}
     <div class="form-checkbox-row">
       {{ option(class="form-checkbox", id=option.id) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>
@@ -33,8 +33,8 @@
 </div>
 
 <!-- Hidden by default, shown only if "Other" is selected -->
-<div class="field" id="otherVolunteerContainer" style="display: none;">
-  {{ form.otherVolunteer(class="form-input form-textarea") }}
+<div class="field" id="other_volunteer_container" style="display: none;">
+  {{ form.other_volunteer(class="form-input form-textarea") }}
 </div>
     
   <div class="form-btn-row" style="display: flex; justify-content: space-between; gap: 1rem;">

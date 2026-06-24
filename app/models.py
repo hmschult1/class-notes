@@ -54,7 +54,7 @@ class AlumniUpdate(db.Model):
 
     submitted_at = db.Column(
         db.DateTime(timezone=True),
-        default=lambda: datetime.datetime.now(datetime.UTC)
+        default=lambda: datetime.datetime.now(datetime.timezone.utc)
     )
     
     update_types = db.Column(db.JSON, nullable=True)
@@ -78,8 +78,8 @@ class AlumniUpdate(db.Model):
         cascade="all, delete-orphan"
     )
 
-    AlumniChildren = db.relationship(
-        "AlumniAlumniChild",
+    children = db.relationship(
+        "AlumniChild",
         back_populates="alumni_update",
         cascade="all, delete-orphan"
     )
@@ -97,7 +97,7 @@ class AlumniUpdate(db.Model):
     )
 
     class_note = db.relationship(
-        "AlumniAlumniClassNote",
+        "AlumniClassNote",
         back_populates="alumni_update",
         uselist=False,
         cascade="all, delete-orphan"
@@ -176,8 +176,8 @@ class AlumniFamilyUpdate(db.Model):
     )
 
 
-class AlumniAlumniChild(db.Model):
-    __tablename__ = "alumni_AlumniChildren"
+class AlumniChild(db.Model):
+    __tablename__ = "alumni_children"
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -194,11 +194,11 @@ class AlumniAlumniChild(db.Model):
 
     alumni_update = db.relationship(
         "AlumniUpdate",
-        back_populates="AlumniChildren"
+        back_populates="children"
     )
 
     def __repr__(self):
-        return f"<AlumniAlumniChild {self.first_name} {self.last_name} ({self.gender})>"
+        return f"<AlumniChild {self.first_name} {self.last_name} ({self.gender})>"
 
 
 class AlumniEmploymentUpdate(db.Model):
@@ -243,7 +243,7 @@ class AlumniEducationUpdate(db.Model):
     )
 
 
-class AlumniAlumniClassNote(db.Model):
+class AlumniClassNote(db.Model):
     __tablename__ = "alumni_class_notes"
 
     id = db.Column(db.Integer, primary_key=True)

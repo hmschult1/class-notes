@@ -3,28 +3,28 @@
 {% block title %}Geneva College Alumni Update{% endblock %}
 
 {% block content %}
-<form method="POST" action="{{ url_for('form.form_AlumniChildren') }}">
+<form method="POST" action="{{ url_for('form.form_children') }}">
   {{ form.hidden_tag() }}
 
   <h1 style="text-align: center">Update Your Alumni Record</h1>
   <hr>
   <h2 style="margin-top: 1.25rem;">Birth Announcements</h2>
   <p class="form-note">As you alert the College to the birth of your AlumniChildren, please also ensure you enroll each AlumniChild in <a style="color: #c7982d;" href="https://www.geneva.edu/alumni/represent/legacylink">Legacy Link</a> so they can recieve gifts as they grow up and additional scholarships if they decide to attend Geneva College!</p>
-  <div id="AlumniChildren-container">
-    {% for AlumniChild_form in form.AlumniChildren %}
-    <div class="AlumniChild-block">
+  <div id="children-container">
+    {% for child_form in form.children %}
+    <div class="child-block">
 
       <!-- Remove button -->
       <div style="text-align: right;">
-        <button type="submit" name="remove_AlumniChild" value="{{ loop.index0 }}" class="remove-btn"
+        <button type="submit" name="remove_child" value="{{ loop.index0 }}" class="remove-btn"
           title="Remove Birth Announcement">
           &times;
         </button>
       </div>
 
       {% for field in [
-     AlumniChild_form.AlumniChildsFirstName, AlumniChild_form.AlumniChildsLastName
-  ] %}
+      child_form.first_name, child_form.last_name
+    ] %}
     <div class="field">
       <label class="form-label"for="{{ field.id }}">
         {{ field.label.text }}
@@ -35,8 +35,8 @@
 {% endfor %}
 
       <div class="field">
-        {{ AlumniChild_form.AlumniChildGender.label }}
-        {% for option in AlumniChild_form.AlumniChildGender %}
+        {{ child_form.gender.label }}
+        {% for option in child_form.gender %}
         <div class="form-checkbox-row">
         <label class="form-label">{{ option() }} {{ option.label.text }}</label>
         </div>
@@ -47,7 +47,7 @@
       <div style="margin-bottom: 2rem;"></div>
 
 {% for field in [
-     AlumniChild_form.AlumniChildsBirthday
+    child_form.birthday
   ] %}
     <div class="field">
       <label class="form-label" for="{{ field.id }}">

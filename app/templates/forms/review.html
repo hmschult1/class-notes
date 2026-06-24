@@ -11,10 +11,10 @@
   {{ form.hidden_tag() }}
 
   {% for section in review_sections %}
-  {% if section.title == "Birth Announcement(s)" and AlumniChildren %}
+  {% if section.title == "Birth Announcement(s)" and children %}
   <h3>{{ section.title }}</h3>
 
-  {% for AlumniChild in AlumniChildren %}
+  {% for AlumniChild in children %}
   <div class="birth-announcement-group">
     {% if AlumniChild.first_name or AlumniChild.last_name %}
     <div class="form-input">Name: {{ AlumniChild.first_name }} {{ AlumniChild.last_name }}</div>

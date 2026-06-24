@@ -1,11 +1,9 @@
-from flask import Blueprint, render_template
-from flask_login import login_required
-from app.models import AlumniClassNote
-from flask import render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, render_template_string, flash, redirect, url_for
 from flask_login import login_required, current_user
+from app.models import AlumniClassNote, AlumniUpdate, Alumni
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.authForms import ChangePasswordForm
-# from app.auForms import EditFullEntryForm
+from app.dashboardForms import EditFullEntryForm
 from app import db
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -14,8 +12,8 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 @dashboard_bp.route('/')
 @login_required
 def dashboard_home():
-    notes = AlumniClassNote.query.order_by(AlumniClassNote.submitted_at.desc()).all()
-    return render_template('admin_panel/landing.html', notes=notes)
+    updates = AlumniUpdate.query.order_by(AlumniUpdate.submitted_at.desc()).all()
+    return render_template('admin_panel/landing.html', updates=updates)
 
 @dashboard_bp.route('/accounts', methods=['GET', 'POST'])
 @login_required
@@ -36,7 +34,11 @@ def dashboard_accounts():
 @dashboard_bp.route('/class-notes')
 @login_required
 def dashboard_AlumniClassNotes():
-    entries = AlumniClassNote.query.order_by(AlumniClassNote.submitted_at.desc()).all()
+    entries = (
+        AlumniClassNote.query.join(AlumniUpdate)
+        .order_by(AlumniUpdate.submitted_at.desc())
+        .all()
+    )
     form = EditFullEntryForm()
     return render_template('admin_panel/class-notes.html', entries=entries, form=form)
 
@@ -47,41 +49,52 @@ def edit_class_note(note_id):
 
     if form.validate_on_submit():
         note = AlumniClassNote.query.get_or_404(note_id)
+        update = note.alumni_update
+        alumnus = update.alumnus
 
-        # Populate fields from form
+        # Populate fields from form into related objects
         note.viewed = True
-        note.first_name = form.firstName.data
-        note.last_name = form.lastName.data
-        note.maiden_name = form.maidenName.data
-        note.email = form.email.data
-        note.phone = form.phone.data
-        note.grad_year = form.gradYear.data
-        note.address_line1 = form.addressLine1.data
-        note.address_line2 = form.addressLine2.data
-        note.city = form.city.data
-        note.state = form.state.data
-        note.postal_code = form.postalCode.data
-        note.country = form.country.data
-        note.marital_status = form.maritalStatus.data
-        note.spouse_name = form.spouseName.data
-        note.spouse_grad_year = form.spouseGradYear.data
-        note.marry_date = form.marryDate.data
-        note.employer = form.employer.data
-        note.position = form.position.data
-        note.non_g_education = form.nonGEducation.data
-        note.additional_updates = form.additionalUpdates.data
-        note.volunteer_opportunities = ', '.join(form.volunteerChoices.data)
-        note.other_volunteer = form.otherVolunteer.data
-        note.class_note = form.AlumniClassNote.data
+
+        alumnus.first_name = form.first_name.data
+        alumnus.last_name = form.last_name.data
+        alumnus.maiden_name = form.maiden_name.data
+        alumnus.email = form.email.data
+        alumnus.phone = form.phone.data
+
+        # Address: update first address if present, else create
+        if alumnus.addresses:
+            addr = alumnus.addresses[0]
+            addr.address_line1 = form.address_line1.data
+            addr.address_line2 = form.address_line2.data
+            addr.city = form.city.data
+            addr.state = form.state.data
+            addr.postal_code = form.postal_code.data
+            addr.country = form.country.data
+        else:
+            from app.models import AlumniAddress
+            addr = AlumniAddress(
+                alumnus_id=alumnus.id,
+                address_line1=form.address_line1.data,
+                address_line2=form.address_line2.data,
+                city=form.city.data,
+                state=form.state.data,
+                postal_code=form.postal_code.data,
+                country=form.country.data,
+            )
+            db.session.add(addr)
+
+        update.additional_updates = form.additional_updates.data
+        update.volunteer_choices = form.volunteer_choices.data or []
+        update.other_volunteer = form.other_volunteer.data
+
+        note.class_note_text = form.class_note_text.data
 
         existing = form.existing_image.data
         if existing:
             note.image_filename = existing
-            print(f"[DEBUG] Preserving existing image: {existing}")
         else:
             note.image_filename = None
-            print("[DEBUG] No existing image found or image removed.")
-        
+
         db.session.commit()
         flash('Entry updated successfully.', 'success')
     else:
