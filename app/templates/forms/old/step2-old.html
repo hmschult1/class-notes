@@ -1,0 +1,117 @@
+{% extends "forms/base.html" %}
+
+{% block title %}Geneva College Alumni Update{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('form.form_step2') }}">
+  {{ form.hidden_tag() }}
+
+  <h1 style="text-align: center">Update Your Alumni Record</h1>
+  <hr>
+  <h2>Family Information (Optional)</h2>
+
+  <div class="field">
+    {{ form.maritalStatus.label }} {{ form.maritalStatus(class="form-select") }}
+  </div>
+
+  <div class="field">
+    {{ form.spouseName.label }} {{ form.spouseName(class="form-input") }}
+  </div>
+
+  <div class="field">
+    {{ form.spouseGradYear.label }} {{ form.spouseGradYear(class="form-input") }}
+  </div>
+
+  <div class="field">
+    {{ form.marryDate.label }} {{ form.marryDate(class="form-input") }}
+  </div>
+
+  <h2>Birth Announcements (Optional)</h2>
+
+  <div id="AlumniChildren-container">
+    {% for AlumniChild_form in form.AlumniChildren %}
+    <div class="AlumniChild-block">
+
+      <!-- Remove button -->
+      <div style="text-align: right;">
+        <button type="submit" name="remove_AlumniChild" value="{{ loop.index0 }}" class="remove-btn"
+          title="Remove this AlumniChild">
+          &times;
+        </button>
+      </div>
+
+      <div class="field">
+        {{ AlumniChild_form.AlumniChildsFirstName.label }}
+        {{ AlumniChild_form.AlumniChildsFirstName(class="form-input") }}
+      </div>
+
+      <div class="field">
+        {{ AlumniChild_form.AlumniChildsLastName.label }}
+        {{ AlumniChild_form.AlumniChildsLastName(class="form-input") }}
+      </div>
+
+      <div class="field">
+        {{ AlumniChild_form.AlumniChildGender.label }}
+        {% for option in AlumniChild_form.AlumniChildGender %}
+        <label>{{ option() }} {{ option.label.text }}</label>
+        {% endfor %}
+      </div>
+
+      <!-- Add spacing between gender and birthday -->
+      <div style="margin-bottom: 2rem;"></div>
+
+      <div class="field">
+        {{ AlumniChild_form.AlumniChildsBirthday.label }}
+        {{ AlumniChild_form.AlumniChildsBirthday(class="form-input") }}
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Add AlumniChild Button -->
+  <button type="submit" name="add_AlumniChild" value="1" class="form-btn">
+    Add Another AlumniChild
+  </button>
+
+  <h2>Employment & Education (Optional)</h2>
+
+  <div class="field">
+    {{ form.employer.label }} {{ form.employer(class="form-input") }}
+  </div>
+
+  <div class="field">
+    {{ form.position.label }} {{ form.position(class="form-input") }}
+  </div>
+
+  <div class="field">
+    {{ form.nonGEducation.label }} {{ form.nonGEducation(class="form-input form-textarea") }}
+  </div>
+
+  <div class="field">
+    {{ form.additionalUpdates.label }} {{ form.additionalUpdates(class="form-input form-textarea") }}
+  </div>
+
+  <h2>Volunteer Opportunities (Optional)</h2>
+
+<div class="field">
+  <label class="form-label">{{ form.volunteerChoices.label }}</label>
+  {% for option in form.volunteerChoices %}
+    <div class="form-checkbox-row">
+      {{ option(class="form-checkbox", id=option.id) }}
+      <label for="{{ option.id }}">{{ option.label.text }}</label>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Hidden by default, shown only if "Other" is selected -->
+<div class="field" id="otherVolunteerContainer" style="display: none;">
+  {{ form.otherVolunteer(class="form-input form-textarea") }}
+</div>
+
+  <div class="form-btn-row" style="display: flex; justify-content: space-between; gap: 1rem;">
+    <button type="submit" name="nav" value="prev" class="form-btn">Previous Page</button>
+    <button type="submit" name="nav" value="next" class="form-btn">Next Page</button>
+  </div>
+</form>
+{% endblock %}

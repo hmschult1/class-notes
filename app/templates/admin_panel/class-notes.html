@@ -1,0 +1,341 @@
+{% extends "admin_panel/base.html" %}
+{% block title %}Class Note Entries · Dashboard{% endblock %}
+
+{% block content %}
+<section>
+  <h2 class="section-title">Class Note Entries</h2>
+
+  <div class="table-wrap">
+    <table class="data-table" aria-label="Class Notes Entries Table">
+      <thead>
+        <tr>
+          <th style="width: 72px; text-align: center;">New</th>
+          <th style="text-align: center;">Name of Alumni</th>
+          <th style="width: 160px; text-align: center;">Class Note</th>
+          <th style="width: 500px; text-align: center;">Date of Submission</th>
+          <th style="width: 160px; text-align: center;">Actions</th>
+          <th style="width: 160px; text-align: center;">Published</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr data-id="{{ entry.id }}">
+          <td class="cell-new">
+            {% if entry.viewed == False %}
+            🔴
+            {% endif %}
+          </td>
+          <td class="cell-name">{{ entry.first_name }} {{ entry.last_name }}</td>
+          <td class="cell-note">{{ entry.class_note_text[:20] }}</td>
+          <td class="cell-date">{{ entry.submitted_at.strftime('%Y-%m-%d') }}</td>
+          <td class="cell-actions">
+            <a href="#" class="edit-link" data-id="{{ entry.id }}" data-first="{{ entry.first_name }}"
+              data-last="{{ entry.last_name }}" data-maiden="{{ entry.maiden_name }}" data-email="{{ entry.email }}"
+              data-phone="{{ entry.phone }}" data-gradyear="{{ entry.grad_year }}"
+              data-address1="{{ entry.address_line1 }}" data-address2="{{ entry.address_line2 }}"
+              data-city="{{ entry.city }}" data-state="{{ entry.state }}" data-zip="{{ entry.postal_code }}"
+              data-country="{{ entry.country }}" data-marital="{{ entry.marital_status }}"
+              data-spouse="{{ entry.spouse_name }}" data-spouseyear="{{ entry.spouse_grad_year }}"
+              data-marrydate="{{ entry.marry_date.strftime('%Y-%m-%d') if entry.marry_date else '' }}"
+              data-employer="{{ entry.employer }}" data-position="{{ entry.position }}"
+              data-education="{{ entry.non_g_education }}" data-updates="{{ entry.additional_updates }}"
+              data-volunteer="{{ entry.volunteer_opportunities }}" data-othervolunteer="{{ entry.other_volunteer }}"
+              data-note="{{ entry.class_note_text|e }}" data-image="{{ entry.image_filename or '' }}">
+              Edit
+            </a>
+
+
+          </td>
+          <td class="cell-published">
+            {% if entry.published == True %}
+            ✅
+            {% endif %}</td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="" id="editForm" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Class Note</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Hidden note id used by JS for the action URL -->
+          <input type="hidden" name="note_id" id="note_id" />
+
+          <div class="mb-3">
+            <strong>{{ form.firstName.label }}</strong>
+            {{ form.firstName(id="firstName", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.lastName.label }}</strong>
+            {{ form.lastName(id="lastName", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.maidenName.label }}</strong>
+            {{ form.maidenName(id="maidenName", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.email.label }}</strong>
+            {{ form.email(id="email", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.phone.label }}</strong>
+            {{ form.phone(id="phone", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.gradYear.label }}</strong>
+            {{ form.gradYear(id="gradYear", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.addressLine1.label }}</strong>
+            {{ form.addressLine1(id="addressLine1", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.addressLine2.label }}</strong>
+            {{ form.addressLine2(id="addressLine2", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.city.label }}</strong>
+            {{ form.city(id="city", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.state.label }}</strong>
+            {{ form.state(id="state", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.postalCode.label }}</strong>
+            {{ form.postalCode(id="postalCode", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.country.label }}</strong>
+            {{ form.country(id="country", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.maritalStatus.label }}</strong>
+            {{ form.maritalStatus(id="maritalStatus", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.spouseName.label }}</strong>
+            {{ form.spouseName(id="spouseName", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.spouseGradYear.label }}</strong>
+            {{ form.spouseGradYear(id="spouseGradYear", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.marryDate.label }}</strong>
+            {{ form.marryDate(id="marryDate", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.AlumniChildsFirstName.label }}</strong>
+            {{ form.AlumniChildsFirstName(id="AlumniChildsFirstName", class="form-control") }}
+          </div>
+          <div class="mb-3">
+            <strong>{{ form.AlumniChildsLastName.label }}</strong>
+            {{ form.AlumniChildsLastName(id="AlumniChildsLastName", class="form-control") }}
+          </div>
+          <div class="mb-3">
+            <strong>{{ form.AlumniChildsGender.label }}</strong>
+            {{ form.AlumniChildsGender(id="AlumniChildsGender") }}
+          </div>
+          <div class="mb-3">
+            <strong>{{ form.AlumniChildsBirthday.label }}</strong>
+            {{ form.AlumniChildsBirthday(id="AlumniChildsBirthday", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.employer.label }}</strong>
+            {{ form.employer(id="employer", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.position.label }}</strong>
+            {{ form.position(id="position", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.nonGEducation.label }}</strong>
+            {{ form.nonGEducation(id="nonGEducation", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.additionalUpdates.label }}</strong>
+            {{ form.additionalUpdates(id="additionalUpdates", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.volunteerChoices.label }}</strong>
+            {{ form.volunteerChoices(id="volunteerChoices") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.otherVolunteer.label }}</strong>
+            {{ form.otherVolunteer(id="otherVolunteer", class="form-control") }}
+          </div>
+
+          <div class="mb-3">
+            <strong>{{ form.AlumniClassNote.label }}</strong>
+            {{ form.AlumniClassNote(id="AlumniClassNote", class="form-control") }}
+          </div>
+
+          <!-- Image block -->
+          <div class="mb-3">
+            <strong>{{ form.image.label }}</strong>
+
+            <!-- Existing image preview -->
+            <div id="image_preview_wrapper" class="mb-2" style="display: none;">
+              <img id="image_preview" src="" alt="Current image" class="img-fluid rounded" />
+              <div class="form-text">This file has been edited for size.</div>
+              <div id="image_filename_display" class="text-muted small"></div>
+            </div>
+
+            <!-- Hidden field to preserve existing image path/url -->
+            {{ form.existing_image(id="existing_image") }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.edit-link').forEach(link => {
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // Use camelCase IDs to match WTForms fields in the modal
+        const mapping = {
+          id: 'note_id',
+          first: 'firstName',
+          last: 'lastName',
+          maiden: 'maidenName',
+          email: 'email',
+          phone: 'phone',
+          gradyear: 'gradYear',
+          address1: 'addressLine1',
+          address2: 'addressLine2',
+          city: 'city',
+          state: 'state',
+          zip: 'postalCode',
+          country: 'country',
+          marital: 'maritalStatus',
+          spouse: 'spouseName',
+          spouseyear: 'spouseGradYear',
+          marrydate: 'marryDate',
+          employer: 'employer',
+          position: 'position',
+          education: 'nonGEducation',
+          updates: 'additionalUpdates',
+          // volunteer: 'volunteerChoices',
+          othervolunteer: 'otherVolunteer',
+          note: 'AlumniClassNote'
+        };
+
+        // Populate all the text/textarea/select inputs
+        for (const dataKey in mapping) {
+          const elementId = mapping[dataKey];
+          const el = document.getElementById(elementId);
+
+          if (el) {
+            let val = this.dataset[dataKey] || '';
+            if (val === 'None') val = '';
+
+            // Basic case: single-value fields
+            el.value = val;
+          }
+        }
+
+        // data-volunteer might be "Admissions, Speaker, Other"
+        const volunteerRaw = this.dataset.volunteer || '';
+        const selectedValues = volunteerRaw
+          .split(',')
+          .map(v => v.trim())
+          .filter(v => v.length > 0);
+
+        // Uncheck all boxes first
+        document.querySelectorAll('input[name="volunteerChoices"]').forEach(cb => {
+          cb.checked = false;
+        });
+
+        // Check boxes whose value is in selectedValues
+        document.querySelectorAll('input[name="volunteerChoices"]').forEach(cb => {
+          if (selectedValues.includes(cb.value)) {
+            cb.checked = true;
+          }
+        });
+
+        // ------- Image handling --------
+        const imageFilename = this.dataset.image;  // from data-image on the link
+        const previewWrapper = document.getElementById('image_preview_wrapper');
+        const previewImg = document.getElementById('image_preview');
+        const existingImageInput = document.getElementById('existing_image');
+        const fileInput = document.getElementById('image');
+        const filenameDisplay = document.getElementById('image_filename_display');
+
+        if (imageFilename && previewWrapper && previewImg && existingImageInput) {
+          const imageUrl = `/static/uploads/${imageFilename}`;
+          previewImg.src = imageUrl;
+          previewWrapper.style.display = 'block';
+          existingImageInput.value = imageFilename;
+
+          // ✅ Show filename visibly
+          if (filenameDisplay) {
+            filenameDisplay.textContent = `Filename: ${imageFilename}`;
+          }
+        } else {
+          previewImg.src = '';
+          previewWrapper.style.display = 'none';
+          existingImageInput.value = '';
+
+          // ✅ Clear visible filename if no image
+          if (filenameDisplay) {
+            filenameDisplay.textContent = '';
+          }
+        }
+
+        // Set the form action to point at the right note
+        document.getElementById('editForm').action =
+          `/dashboard/class-notes/${this.dataset.id}/edit`;
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('editModal'));
+        modal.show();
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "forms/base.html" %}
+
+{% block title %}Geneva College Alumni Update{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('form.form_contact') }}">
+  {{ form.hidden_tag() }}
+
+  <h1 style="text-align: center">Update Your Alumni Record</h1>
+  <hr>
+  <h2 style="margin-top: 1.25rem;">Contact Information</h2>
+
+  <p class="form-note"><span class="required-asterisk">*</span> Required fields</p>
+
+  {% for field in [
+  form.prefSalutation, form.email
+  ] %}
+  <div class="field">
+    <label for="{{ field.id }}">
+      {{ field.label.text }}
+      {% if field.flags.required %}
+      <span class="required-asterisk">*</span>
+      {% endif %}
+    </label>
+    {{ field(class="form-input" if field.type != 'SelectField' else "form-select") }}
+
+    {# Display validation errors inline #}
+    {% if field.errors %}
+    <ul class="form-errors">
+      {% for error in field.errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="field">
+    {{ form.phoneType.label }}
+    <span class="required-asterisk">*</span>
+    {% for option in form.phoneType %}
+    <div class="form-checkbox-row">
+    <label>
+      {{ option() }} {{ option.label.text }}
+    </label>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="margin-bottom: 1.5rem;"></div>
+
+  {% for field in [
+  form.phone, form.addressLine1, form.addressLine2, form.city, form.state,
+  form.postalCode, form.country
+  ] %}
+  <div class="field">
+    <label class="form-label" for="{{ field.id }}">
+      {{ field.label.text }}
+      {% if field.flags.required %}
+      <span class="required-asterisk">*</span>
+      {% endif %}
+    </label>
+    {{ field(class="form-input" if field.type != 'SelectField' else "form-select") }}
+
+    {# Display validation errors inline #}
+    {% if field.errors %}
+    <ul class="form-errors">
+      {% for error in field.errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+
+  <div class="form-btn-row" style="display: flex; justify-content: space-between; gap: 1rem;">
+    <button type="submit" name="nav" value="prev" class="form-btn">Previous Page</button>
+    <button type="submit" name="nav" value="next" class="form-btn">Next Page</button>
+  </div>
+</form>
+{% endblock %}
