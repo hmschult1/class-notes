@@ -422,8 +422,8 @@ def form_volunteer():
             return redirect(url_for("form.form_final_review"))
 
         elif nav == 'prev':
-            if session.get("class_note_option") == "Yes":
-                return redirect(url_for("form.form_AlumniClassNote"))
+            if session.get("wants_class_note") == "Yes":
+                return redirect(url_for("form.form_class_note"))
             return redirect(last_selected_update_url())
         
     if request.method == 'GET':
