@@ -488,7 +488,7 @@ def form_class_note():
         else:
             image_url = None
 
-        return render_template('forms/class-note.html', form=form, image_url=image_url)
+        return render_template('forms/class_note.html', form=form, image_url=image_url)
 
     # === Validation error (length, etc.) ===
     if form.class_note_text.errors:
@@ -819,9 +819,9 @@ def submit_final():
         db.session.commit()
 
         email_body = render_template(
-            "forms/email/thank-you-email.html",
+            'email/thank-you-email.html',
             full_data=session,
-            AlumniChildren=session.get("AlumniChildren", [])
+            children=session.get("children", [])
         )
 
         send_email(
@@ -842,7 +842,7 @@ def submit_final():
 
 @form_bp.route('/thank-you')
 def thank_you():
-    return render_template('forms/thank-you.html')   
+    return render_template('forms/thanks.html')   
     
     
                                       
