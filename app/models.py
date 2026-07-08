@@ -37,7 +37,7 @@ class Alumni(db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     maiden_name = db.Column(db.String(100))
     pref_salutation = db.Column(db.String(100))
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120))
     phone = db.Column(db.String(30))
     phone_type = db.Column(db.Enum(PhoneType), nullable=True)
 
