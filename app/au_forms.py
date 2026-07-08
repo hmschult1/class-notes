@@ -165,12 +165,12 @@ class VolunteerForm(FlaskForm):
     volunteer_choices = SelectMultipleField(
         "Select Volunteer Opportunities:",
         choices=[
+            ('None', "Not interested in volunteering at this time"),
             ('Help with admissions in my area', "Help with admissions in my area"),
             ('Speak to current students', "Speak to current students"),
             ('Serve on my class reunion committee', "Serve on my class reunion committee"),
             ('Host an alumni event', "Host an alumni event"),
             ('Other', "Other"),
-            ('None', "Not interested in volunteering at this time"),
         ],
         option_widget=CheckboxInput(),
         widget=ListWidget(prefix_label=True),
