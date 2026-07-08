@@ -330,7 +330,7 @@ def form_children():
         if not form.children.entries:
             form.children.append_entry()
 
-    return render_template('forms/children.html', form=form)
+    return render_template('forms/children.html', children=form.children.data, form=form)
 
             
 @form_bp.route('/employment', methods=['GET', 'POST'])
@@ -680,7 +680,7 @@ def form_final_review():
         elif nav == 'prev':
             return redirect(url_for("form.form_step1"))
         
-    return render_template('forms/review.html', review_sections=review_sections, noteFlag=noteFlag, AlumniChildren=children, form=form) 
+    return render_template('forms/review.html', review_sections=review_sections, noteFlag=noteFlag, children=children, form=form) 
 
 @form_bp.route('/submit-final', methods=['GET', 'POST'])
 def submit_final():
