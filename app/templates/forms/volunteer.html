@@ -12,17 +12,7 @@
   <p class="form-note">Geneva's alumni are one of the College's greatest strengths, and volunteers help foster meaningful connections, support current students, and advance the mission of Geneva College. If you're interested in giving back, we'd love for you to consider one of the volunteer opportunities below.
 </p>
 
-<div class="field">
-  <label class="form-label">{{ form.volunteer_radio.label }}</label>
-  {% for option in form.volunteer_radio %}
-    <div class="form-checkbox-row">
-      {{ option(class="form-checkbox", id=option.id) }}
-      <label for="{{ option.id }}">{{ option.label.text }}</label>
-    </div>
-  {% endfor %}
-</div>
-
-  <div class="field" id="volunteer_options_container" style="display: none;">
+  <div class="field" id="volunteer_options_container">
   <label class="form-label">{{ form.volunteer_choices.label }}</label>
   {% for option in form.volunteer_choices %}
     <div class="form-checkbox-row">

@@ -223,35 +223,6 @@ function remove_birth_section(button) {
   }
 });
 
-// volunteer opportunities if Yes
-// reveal field for spouse's grad year if option "yes" selected
-document.addEventListener("DOMContentLoaded", function () {
-    const volunteer_radios = document.querySelectorAll(
-      'input[name="volunteer_radio"]'
-    );
-
-    const volunteer_options = document.getElementById("volunteer_options_container");
-
-    function toggle_volunteer_radio() {
-      const selected = document.querySelector(
-        'input[name="volunteer_radio"]:checked'
-      );
-
-      if (selected && selected.value === "Yes") {
-        volunteer_options.style.display = "block";
-      } else {
-        volunteer_options.style.display = "none";
-      }
-    }
-
-    volunteer_radios.forEach(radio => {
-      radio.addEventListener("change", toggle_volunteer_radio);
-    });
-
-    // Handle page refresh / pre-populated values
-    toggle_volunteer_radio();
-});
-
 // prev and next buttons
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector("form");

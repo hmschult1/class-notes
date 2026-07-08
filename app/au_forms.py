@@ -162,11 +162,6 @@ class VolunteerForm(FlaskForm):
     checkbox list. `other_volunteer` holds free-form text when 'Other' is
     selected.
     """
-    volunteer_radio = RadioField(
-        "Are you interested in volunteering as a Geneva alumni?",
-        choices=[('Yes', 'Yes, show me volunteer opportunities!'), ('No', 'No, I am not interested at this time.')],
-        validators=[Optional()]
-    )
     volunteer_choices = SelectMultipleField(
         "Select Volunteer Opportunities:",
         choices=[
@@ -175,6 +170,7 @@ class VolunteerForm(FlaskForm):
             ('Serve on my class reunion committee', "Serve on my class reunion committee"),
             ('Host an alumni event', "Host an alumni event"),
             ('Other', "Other"),
+            ('None', "Not interested in volunteering at this time"),
         ],
         option_widget=CheckboxInput(),
         widget=ListWidget(prefix_label=True),

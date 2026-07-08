@@ -85,7 +85,6 @@ class AlumniUpdate(db.Model):
     update_types = db.Column(db.JSON, nullable=True)
     wants_class_note = db.Column(db.Boolean, default=False)
     additional_updates = db.Column(db.Text)
-    volunteer_radio = db.Column(db.Boolean, default=False)
     volunteer_choices = db.Column(db.JSON, nullable=True)
     other_volunteer = db.Column(db.Text)
 

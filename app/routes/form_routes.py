@@ -416,7 +416,6 @@ def form_volunteer():
         nav = request.form.get('nav')
 
         if nav == 'next' and form.validate_on_submit():
-            session['volunteer_radio'] = form.volunteer_radio.data
             session['volunteer_choices'] = form.volunteer_choices.data or []
             session['other_volunteer'] = form.other_volunteer.data or ""
             return redirect(url_for("form.form_final_review"))
@@ -427,7 +426,6 @@ def form_volunteer():
             return redirect(last_selected_update_url())
         
     if request.method == 'GET':
-        form.volunteer_radio.data = session.get('volunteer_radio')
         form.volunteer_choices.data = session.get('volunteer_choices', [])
         form.other_volunteer.data = session.get('other_volunteer', "")    
         
