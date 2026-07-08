@@ -9,6 +9,7 @@
       background-color: #f9f9f9;
       padding: 20px;
     }
+
     .container {
       background-color: #ffffff;
       padding: 20px;
@@ -17,86 +18,96 @@
       margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 15px;
+      margin-bottom: 18px;
     }
+
     td {
       padding: 6px 10px;
       vertical-align: top;
+      border-bottom: 1px solid #eee;
     }
-    h2, h3, h4 {
+
+    h2, h3 {
       color: #c7982d;
+    }
+
+    .label-cell {
+      width: 35%;
+      font-weight: bold;
     }
   </style>
 </head>
+
 <body>
 <div class="container">
-  <h2>🎓 Alumni Update Submission</h2>
+  <h2>Confirmed! Alumni Update Submission</h2>
 
-  <h3>Biographical Information</h3>
-  <table>
-    <tr><td><strong>First Name:</strong></td><td>{{ full_data.first_name }}</td></tr>
-    <tr><td><strong>Last Name:</strong></td><td>{{ full_data.last_name }}</td></tr>
-    <tr><td><strong>Maiden Name:</strong></td><td>{{ full_data.maiden_name or "—" }}</td></tr>
-    <tr><td><strong>Graduation Year:</strong></td><td>{{ full_data.grad_year }}</td></tr>
-    <tr><td><strong>Email:</strong></td><td>{{ full_data.email }}</td></tr>
-    <tr><td><strong>Phone:</strong></td><td>{{ full_data.phone or "—" }}</td></tr>
-    <tr><td><strong>Address:</strong></td><td>{{ full_data.address_line1 }} {{ full_data.address_line2 or "" }}, {{ full_data.city }}, {{ full_data.state }} {{ full_data.postal_code }}, {{ full_data.country }}</td></tr>
-  </table>
+  {% for section in review_sections %}
 
-  <h3>Family Information</h3>
-  <table>
-    <tr><td><strong>Marital Status:</strong></td><td>{{ full_data.marital_status or "—" }}</td></tr>
-    <tr><td><strong>Spouse Name:</strong></td><td>{{ full_data.spouse_name or "—" }}</td></tr>
-    <tr><td><strong>Spouse Graduation Year:</strong></td><td>{{ full_data.spouse_grad_year or "—" }}</td></tr>
-    <tr><td><strong>Date of Marriage:</strong></td><td>{{ full_data.date_of_marriage or "—" }}</td></tr>
-  </table>
+    {% if section.title == "Birth Announcement(s)" and children %}
+      <h3>{{ section.title }}</h3>
 
-  {% if AlumniChildren %}
-    <h3>Birth Announcements</h3>
-    <table>
-      <tr>
-        <td><strong>Name</strong></td>
-        <td><strong>Gender</strong></td>
-        <td><strong>Birthday</strong></td>
-      </tr>
-      {% for AlumniChild in AlumniChildren %}
+      <table>
         <tr>
-          <td>{{ AlumniChild.first_name }} {{ AlumniChild.last_name }}</td>
-          <td>{{ AlumniChild.gender }}</td>
-          <td>{{ AlumniChild.birthday or "—" }}</td>
+          <td class="label-cell">Name</td>
+          <td class="label-cell">Gender</td>
+          <td class="label-cell">Birthday</td>
         </tr>
+
+        {% for child in children %}
+          <tr>
+            <td>{{ child.first_name }} {{ child.last_name }}</td>
+            <td>{{ child.gender }}</td>
+            <td>{{ child.birthday }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+
+    {% else %}
+
+      {% set visible_fields = [] %}
+
+      {% for field in section.fields %}
+        {% if field.label != "Birth Announcements" and field.value %}
+          {% set _ = visible_fields.append(field) %}
+        {% endif %}
       {% endfor %}
-    </table>
-  {% else %}
-    <p>No AlumniChildren listed.</p>
-  {% endif %}
 
-  <h3>Education & Employment</h3>
-  <table>
-    <tr><td><strong>Employer:</strong></td><td>{{ full_data.employer or "—" }}</td></tr>
-    <tr><td><strong>Position:</strong></td><td>{{ full_data.position or "—" }}</td></tr>
-    <tr><td><strong>Non-Geneva Education:</strong></td><td>{{ full_data.non_geneva_education or "—" }}</td></tr>
-    <tr><td><strong>Additional Updates:</strong></td><td>{{ full_data.additional_updates or "—" }}</td></tr>
-  </table>
+      {% if visible_fields %}
+        <h3>{{ section.title }}</h3>
 
-  <h3>Volunteer Information</h3>
-  <table>
-    <tr><td><strong>Selected Areas:</strong></td><td>
-      {% if full_data.volunteer_choices %}
-        {{ full_data.volunteer_choices | join(', ') }}
-      {% else %}
-        None selected.
+        <table>
+          {% for field in visible_fields %}
+            <tr>
+              <td class="label-cell">{{ field.label }}</td>
+              <td>
+                {% if field.label in ["Geneva Degree(s)", "Spouse's Geneva Degree(s)"] and field.value is iterable and field.value is not string %}
+                  {% for value in field.value %}
+                    {{ value.degree }}{% if value.year %}: {{ value.year }}{% endif %}{% if not loop.last %}<br>{% endif %}
+                  {% endfor %}
+
+                {% elif field.label in ["Selected Update(s)", "Volunteer Opportunities"] and field.value is iterable and field.value is not string %}
+                  {{ field.value | join(", ") }}
+
+                {% elif field.value is iterable and field.value is not string %}
+                  {{ field.value | join(", ") }}
+
+                {% else %}
+                  {{ field.value }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
       {% endif %}
-    </td></tr>
-    <tr><td><strong>Other Volunteer Ideas:</strong></td><td>{{ full_data.other_volunteer_text or "—" }}</td></tr>
-  </table>
 
-  <h3>Class Note</h3>
-  <p>{{ full_data.class_note or "No class note provided." }}</p>
+    {% endif %}
 
+  {% endfor %}
 </div>
 </body>
 </html>

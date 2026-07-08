@@ -687,6 +687,8 @@ def submit_final():
     if request.form.get('nav') == 'prev':
         return redirect(url_for("form.form_final_review"))
 
+    review_sections = build_review_sections(session)
+
     try:
         # Create normalized objects
         alumnus = Alumni(
@@ -821,6 +823,7 @@ def submit_final():
         email_body = render_template(
             'email/thank-you-email.html',
             full_data=session,
+            review_sections=review_sections,
             children=session.get("children", [])
         )
 
