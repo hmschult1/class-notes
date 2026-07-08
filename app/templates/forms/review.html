@@ -14,18 +14,18 @@
   {% if section.title == "Birth Announcement(s)" and children %}
   <h3>{{ section.title }}</h3>
 
-  {% for AlumniChild in children %}
+  {% for child in children %}
   <div class="birth-announcement-group">
-    {% if AlumniChild.first_name or AlumniChild.last_name %}
-    <div class="form-input">Name: {{ AlumniChild.first_name }} {{ AlumniChild.last_name }}</div>
+    {% if child.first_name or child.last_name %}
+    <div class="form-input">Name: {{ child.first_name }} {{ child.last_name }}</div>
     {% endif %}
 
-    {% if AlumniChild.gender %}
-    <div class="form-input">Gender: {{ AlumniChild.gender }}</div>
+    {% if child.gender %}
+    <div class="form-input">Gender: {{ child.gender }}</div>
     {% endif %}
 
-    {% if AlumniChild.birthday %}
-    <div class="form-input">Birthday: {{ AlumniChild.birthday }}</div>
+    {% if child.birthday %}
+    <div class="form-input">Birthday: {{ child.birthday }}</div>
     {% endif %}
   </div>
   {% endfor %}
@@ -33,6 +33,7 @@
   {% else %} <h3>{{ section.title }}</h3>
 
   {% for field in section.fields %}
+  {% if field.label != "Birth Announcements" %}
   <div class="form-input">
     {{ field.label }}:
 
@@ -75,6 +76,7 @@
     {{ field.value }}
     {% endif %}
   </div>
+    {% endif %}
   {% endfor %}
   {% endif %}
   {% endfor %}

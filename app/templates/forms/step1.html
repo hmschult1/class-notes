@@ -44,7 +44,7 @@
   {% for option in form.geneva_degrees %}
   <div class="geneva-degree-row">
     <div class="geneva-degree-option">
-      {{ option(class="form-checkbox", id=option.id) }}
+      {{ option(class="form-checkbox", id=option.id, required=False) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>
     </div>
 
@@ -73,7 +73,7 @@
   <label class="form-label">{{ form.update_types.label }} <span class="required-asterisk">*</span></label>
   {% for option in form.update_types %}
     <div class="form-checkbox-row">
-      {{ option(class="form-checkbox", id=option.id) }}
+      {{ option(class="form-checkbox", id=option.id, required=False) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>
     </div>
   {% endfor %}
