@@ -1,10 +1,16 @@
 {% extends "forms/base.html" %}
-{% block title %}Alumni Update Form{% endblock %}
+
+{% block title %}Geneva College Alumni Update{% endblock %}
+
 {% block content %}
-<h2 style="text-align: center">Thank You!</h2>
-<p style="text-align: center">Your alumni update has been submitted successfully. The Office of Alumni Engagement will reach out to you if further clarification is needed.</p>
+<h1 style="text-align: center">Submission Successful!</h1>
+  <hr>
+  <h2 style="margin-top: 1.25rem;">Thank you for staying connected with Geneva.</h2>
+<p style="text-align: left">Your alumni update has been submitted successfully! <br><br>The Office of Alumni Engagement will reach out to you if further clarification is needed in order to update your record.</p>
 <div class="form-btn-row" style="display: flex; justify-content: space-between; gap: 1rem;">
 <a href="{{ url_for('form.form_step1') }}" class="form-btn">Submit Another Alumni Update</a>
-<a href="https://www.geneva.edu/alumni/" class="form-btn">Retun to Alumni @ Geneva</a>
+</div>
+<div class="form-btn-row" style="display: flex; justify-content: space-between; gap: 1rem;">
+<a href="https://www.geneva.edu/alumni/" class="form-btn">Return to Alumni @ Geneva</a>
 </div>
 {% endblock %}
