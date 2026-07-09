@@ -164,6 +164,10 @@ def form_step1():
             if selected_updates:
                 first_update = selected_updates[0]
                 return redirect(url_for(UPDATE_ROUTES[first_update]))
+            
+        else:
+            return render_template('forms/step1.html', form=form)
+                
 
     # Prepopulate form from session if available
     if request.method == 'GET':

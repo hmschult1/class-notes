@@ -320,3 +320,13 @@
        margin-top: 1.5rem;
        position: relative;
    }
+
+   .form-error {
+    color: #c62828;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.form-errors {
+    margin-top: 0.5rem;
+}

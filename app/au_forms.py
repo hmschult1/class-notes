@@ -14,26 +14,31 @@ from wtforms import (
     RadioField, SelectMultipleField, SubmitField, TelField, HiddenField
 )
 from wtforms.validators import (
-    DataRequired, Email, EqualTo, Optional, Length
+    DataRequired, Email, EqualTo, Optional, Length, ValidationError
 )
 from wtforms.widgets import ListWidget, CheckboxInput
 from flask_wtf.file import FileField, FileAllowed
 from app.utils.countries import country_list
 
+
 class Step1Form(FlaskForm):
+    def validate_geneva_degrees(self, field):
+        if not field.data:
+            raise ValidationError("Please select at least one Geneva degree.")
+        
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
     maiden_name = StringField('Maiden Name (if applicable)', validators=[Optional()])
     geneva_degrees = SelectMultipleField(
         "Geneva Degree(s)",
         choices=[
-            ("TUG", "Undergraduate Degree"),
-            ("Grad", "Graduate Degree"),
-            ("ODP", "Online Degree"),
+            ("Undergraduate", "Undergraduate Degree"),
+            ("Graduate", "Graduate Degree"),
+            ("Online Degree", "Online Degree"),
         ],
         option_widget=CheckboxInput(),
         widget=ListWidget(prefix_label=True),
-        validators=[DataRequired()]
+        validators=[]
     )
     undergrad_year = StringField("Undergraduate Graduation Year", validators=[Optional()])
     graduate_year = StringField("Graduate Graduation Year", validators=[Optional()])
@@ -50,7 +55,7 @@ class Step1Form(FlaskForm):
         ],
         option_widget=CheckboxInput(),
         widget=ListWidget(prefix_label=True),
-        validators=[DataRequired()]
+        validators=[Optional()]
     )
     wants_class_note = RadioField(
         "Would you like to submit a Class Note in addition to updating your alumni record?",
@@ -109,9 +114,9 @@ class FamilyForm(FlaskForm):
     spouse_geneva_degrees = SelectMultipleField(
         "Spouse's Geneva Degree(s)",
         choices=[
-            ("TUG", "Undergraduate"),
-            ("Grad", "Graduate"),
-            ("ODP", "Online"),
+            ("Undergraduate", "Undergraduate"),
+            ("Graduate", "Graduate"),
+            ("Online Degree", "Online Degree"),
         ],
         option_widget=CheckboxInput(),
         widget=ListWidget(prefix_label=True),

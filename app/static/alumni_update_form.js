@@ -39,9 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // degree type selector - add grad year field to degrees selected
   function toggle_grad_year_fields() {
-    const tug = document.querySelector('input[name="geneva_degrees"][value="TUG"]');
-    const grad = document.querySelector('input[name="geneva_degrees"][value="Grad"]');
-    const odp = document.querySelector('input[name="geneva_degrees"][value="ODP"]');
+    const tug = document.querySelector('input[name="geneva_degrees"][value="Undergraduate"]');
+    const grad = document.querySelector('input[name="geneva_degrees"][value="Graduate"]');
+    const odp = document.querySelector('input[name="geneva_degrees"][value="Online Degree"]');
 
     document.getElementById('undergrad-wrapper').style.display =
         tug && tug.checked ? 'inline-block' : 'none';
@@ -63,9 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // spouse degree type selector - add grad year field to degrees selected
   function toggle_spouse_grad_year_fields() {
-    const tug = document.querySelector('input[name="spouse_geneva_degrees"][value="TUG"]');
-    const grad = document.querySelector('input[name="spouse_geneva_degrees"][value="Grad"]');
-    const odp = document.querySelector('input[name="spouse_geneva_degrees"][value="ODP"]');
+    const tug = document.querySelector('input[name="spouse_geneva_degrees"][value="Undergraduate"]');
+    const grad = document.querySelector('input[name="spouse_geneva_degrees"][value="Graduate"]');
+    const odp = document.querySelector('input[name="spouse_geneva_degrees"][value="Online Degree"]');
 
     document.getElementById('undergrad-wrapper').style.display =
         tug && tug.checked ? 'inline-block' : 'none';

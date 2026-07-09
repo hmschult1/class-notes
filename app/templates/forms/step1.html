@@ -49,17 +49,17 @@
     </div>
 
     <div class="geneva-degree-year">
-      {% if option._value() == "TUG" %}
+      {% if option._value() == "Undergraduate" %}
         <div id="undergrad-wrapper" style="display:none;">
           {{ form.undergrad_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
-      {% elif option._value() == "Grad" %}
+      {% elif option._value() == "Graduate" %}
         <div id="graduate-wrapper" style="display:none;">
           {{ form.graduate_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
-      {% elif option._value() == "ODP" %}
+      {% elif option._value() == "Online Degree" %}
         <div id="online-wrapper" style="display:none;">
           {{ form.online_year(class="form-input", placeholder="Grad Year") }}
         </div>
@@ -68,12 +68,20 @@
   </div>
 {% endfor %}
 
+{% if form.geneva_degrees.errors %}
+  <ul class="form-errors">
+    {% for error in form.geneva_degrees.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
   <h2>Choose Your Update(s)</h2>
   <div class="field">
   <label class="form-label">{{ form.update_types.label }} <span class="required-asterisk">*</span></label>
   {% for option in form.update_types %}
     <div class="form-checkbox-row">
-      {{ option(class="form-checkbox", id=option.id, required=False) }}
+      {{ option(class="form-checkbox", id=option.id, ) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>
     </div>
   {% endfor %}

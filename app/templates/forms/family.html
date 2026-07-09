@@ -46,17 +46,17 @@
     </div>
 
     <div class="geneva-degree-year">
-      {% if option._value() == "TUG" %}
+      {% if option._value() == "Undergraduate" %}
         <div id="undergrad-wrapper" style="display:none;">
           {{ form.spouse_undergrad_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
-      {% elif option._value() == "Grad" %}
+      {% elif option._value() == "Graduate" %}
         <div id="graduate-wrapper" style="display:none;">
           {{ form.spouse_graduate_year(class="form-input", placeholder="Grad Year") }}
         </div>
 
-      {% elif option._value() == "ODP" %}
+      {% elif option._value() == "Online Degree" %}
         <div id="online-wrapper" style="display:none;">
           {{ form.spouse_online_year(class="form-input", placeholder="Grad Year") }}
         </div>
