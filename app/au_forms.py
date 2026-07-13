@@ -2,7 +2,7 @@
 
 Each FlaskForm maps closely to a section of the multi-step wizard and
 to session keys used in `form_routes.py`. Field names (e.g.
-`geneva_degrees`, `spouse_geneva_degrees`, `volunteer_radio`) are
+`geneva_degrees`, `spouse_geneva_degrees`) are
 intentionally snake_case to match the session keys and template
 input `name` attributes.
 """
@@ -14,7 +14,7 @@ from wtforms import (
     RadioField, SelectMultipleField, SubmitField, TelField, HiddenField
 )
 from wtforms.validators import (
-    DataRequired, Email, EqualTo, Optional, Length, ValidationError
+    DataRequired, Email, Optional, Length, ValidationError
 )
 from wtforms.widgets import ListWidget, CheckboxInput
 from flask_wtf.file import FileField, FileAllowed
