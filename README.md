@@ -114,5 +114,5 @@ The application reads configuration from the .env file. The example file include
 ## Notes
 
 - The form flow is implemented as a wizard and stores intermediate data in the user session until submission.
-- Uploaded class-note images are stored under the app static uploads directory.
+- Uploaded class-note images will be stored in a CMS folder.
 - Email delivery failures are logged rather than blocking the submission flow.
