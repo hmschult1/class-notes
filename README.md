@@ -18,7 +18,7 @@ A Flask web application for collecting and storing alumni update submissions thr
 - app/ - Flask application package
   - routes/ - form wizard routes and submission logic
   - templates/forms/ - HTML templates for each form step
-  - static/ - CSS, JavaScript, and uploaded files
+  - static/ - CSS and JavaScript
   - utils/ - helper modules such as SendGrid integration
 - config.py - application configuration
 - run.py - application entry point
