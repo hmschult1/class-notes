@@ -7,6 +7,7 @@ intentionally snake_case to match the session keys and template
 input `name` attributes.
 """
 
+from altair import value
 from wtforms import FieldList, FormField
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -20,11 +21,28 @@ from wtforms.widgets import ListWidget, CheckboxInput
 from flask_wtf.file import FileField, FileAllowed
 from app.utils.countries import country_list
 
+def is_blank(value):
+        return value is None or not str(value).strip()
 
 class Step1Form(FlaskForm):
     def validate_geneva_degrees(self, field):
         if not field.data:
             raise ValidationError("Please select at least one Geneva degree.")
+
+    def validate_undergrad_year(self, field):
+        selected_degrees = self.geneva_degrees.data or []
+        if "Undergraduate" in selected_degrees and is_blank(field.data):
+            raise ValidationError("Please enter your undergraduate graduation year.")
+
+    def validate_graduate_year(self, field):
+        selected_degrees = self.geneva_degrees.data or []
+        if "Graduate" in selected_degrees and is_blank(field.data):
+            raise ValidationError("Please enter your graduate graduation year.")
+
+    def validate_online_year(self, field):
+        selected_degrees = self.geneva_degrees.data or []
+        if "Online Degree" in selected_degrees and is_blank(field.data):
+            raise ValidationError("Please enter your online program graduation year.")   
         
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])

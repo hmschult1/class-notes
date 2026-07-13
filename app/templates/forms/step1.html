@@ -52,16 +52,27 @@
       {% if option._value() == "Undergraduate" %}
         <div id="undergrad-wrapper" style="display:none;">
           {{ form.undergrad_year(class="form-input", placeholder="Grad Year") }}
+
+          {% for error in form.undergrad_year.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
         </div>
+  
 
       {% elif option._value() == "Graduate" %}
         <div id="graduate-wrapper" style="display:none;">
           {{ form.graduate_year(class="form-input", placeholder="Grad Year") }}
+          {% for error in form.graduate_year.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
         </div>
 
       {% elif option._value() == "Online Degree" %}
         <div id="online-wrapper" style="display:none;">
           {{ form.online_year(class="form-input", placeholder="Grad Year") }}
+          {% for error in form.online_year.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
         </div>
       {% endif %}
     </div>

@@ -37,28 +37,58 @@ document.addEventListener("DOMContentLoaded", function () {
   toggle_other_field();
 });
 
-// degree type selector - add grad year field to degrees selected
-  function toggle_grad_year_fields() {
-    const tug = document.querySelector('input[name="geneva_degrees"][value="Undergraduate"]');
-    const grad = document.querySelector('input[name="geneva_degrees"][value="Graduate"]');
-    const odp = document.querySelector('input[name="geneva_degrees"][value="Online Degree"]');
+document.addEventListener("DOMContentLoaded", function () {
+    const mappings = [
+        {
+            value: "Undergraduate",
+            wrapperId: "undergrad-wrapper",
+            fieldId: "undergrad_year"
+        },
+        {
+            value: "Graduate",
+            wrapperId: "graduate-wrapper",
+            fieldId: "graduate_year"
+        },
+        {
+            value: "Online Degree",
+            wrapperId: "online-wrapper",
+            fieldId: "online_year"
+        }
+    ];
 
-    document.getElementById('undergrad-wrapper').style.display =
-        tug && tug.checked ? 'inline-block' : 'none';
+    function toggleGradYearFields() {
+        mappings.forEach(function ({ value, wrapperId, fieldId }) {
+            const checkbox = document.querySelector(
+                `input[name="geneva_degrees"][value="${value}"]`
+            );
 
-    document.getElementById('graduate-wrapper').style.display =
-        grad && grad.checked ? 'inline-block' : 'none';
+            const fieldWrapper = document.getElementById(wrapperId);
+            const yearField = document.getElementById(fieldId);
 
-    document.getElementById('online-wrapper').style.display =
-        odp && odp.checked ? 'inline-block' : 'none';
-}
+            if (!checkbox || !fieldWrapper || !yearField) {
+                return;
+            }
 
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('input[name="geneva_degrees"]').forEach(cb => {
-    cb.addEventListener('change', toggle_grad_year_fields);
-  });
+            if (checkbox.checked) {
+                fieldWrapper.style.display = "inline-block";
+                yearField.required = true;
+            } else {
+                fieldWrapper.style.display = "none";
+                yearField.required = false;
 
-  toggle_grad_year_fields();
+                // Optional: clear the value when the degree is unchecked.
+                // yearField.value = "";
+            }
+        });
+    }
+
+    document
+        .querySelectorAll('input[name="geneva_degrees"]')
+        .forEach(function (checkbox) {
+            checkbox.addEventListener("change", toggleGradYearFields);
+        });
+
+    toggleGradYearFields();
 });
 
 // spouse degree type selector - add grad year field to degrees selected
