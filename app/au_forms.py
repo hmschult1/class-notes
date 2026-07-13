@@ -7,7 +7,6 @@ intentionally snake_case to match the session keys and template
 input `name` attributes.
 """
 
-from altair import value
 from wtforms import FieldList, FormField
 from flask_wtf import FlaskForm
 from wtforms import (
