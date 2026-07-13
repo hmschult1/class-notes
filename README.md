@@ -26,7 +26,7 @@ A Flask web application for collecting and storing alumni update submissions thr
 
 ## Requirements
 
-The app uses the following Python packages:
+Dependencies are listed in requirements.txt and include:
 
 - Flask
 - Flask-SQLAlchemy
@@ -35,6 +35,7 @@ The app uses the following Python packages:
 - PyMySQL
 - python-dotenv
 - sendgrid
+- email-validator
 
 ## Local Setup
 
@@ -49,7 +50,7 @@ The app uses the following Python packages:
 3. Install dependencies:
 
    ```bash
-   pip install flask flask-sqlalchemy flask-migrate flask-wtf pymysql python-dotenv sendgrid
+   pip install -r requirements.txt
    ```
 
 4. Copy the example environment file and update the values:
