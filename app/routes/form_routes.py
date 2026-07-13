@@ -639,9 +639,8 @@ def build_review_sections(session_data):
         {
             "title": "Volunteer Opportunities",
             "fields": [
-                ("Interest", session_data.get("volunteer_radio")),
-                ("Volunteer Opportunities", session_data.get("volunteer_choices")),
-                ("Other Volunteer Idea", session_data.get("other_volunteer")),
+                ("Volunteer Interest", session_data.get("volunteer_choices")),
+                ("Other Volunteer Idea(s)", session_data.get("other_volunteer")),
             ],
         },
     ]
@@ -724,7 +723,6 @@ def submit_final():
             update_types=session.get("update_types", []),
             wants_class_note=(session.get("wants_class_note") == "Yes"),
             additional_updates=session.get("additional_updates"),
-            volunteer_radio=(session.get("volunteer_radio") == "Yes"),
             volunteer_choices=session.get("volunteer_choices", []),
             other_volunteer=session.get("other_volunteer"),
         )
