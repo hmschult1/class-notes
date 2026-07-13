@@ -76,8 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 fieldWrapper.style.display = "none";
                 yearField.required = false;
 
-                // Optional: clear the value when the degree is unchecked.
-                // yearField.value = "";
+                // Clear the value when the degree is unchecked.
+                yearField.value = "";
             }
         });
     }
