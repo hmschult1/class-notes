@@ -240,6 +240,27 @@
        transition: background-color 0.2s, box-shadow 0.2s;
    }
 
+   /* previous button styling */
+   .form-btn-prev {
+       text-align: center;
+       text-decoration: none;
+       width: 100%;
+       font-size: 1rem;
+       /* 16px */
+       border-radius: 0.5rem;
+       /* 8px */
+       padding: 0.875rem 1.5rem;
+       /* 14px 24px */
+       border: none;
+       font-weight: 600;
+       background-color: #787677;
+       color: white;
+       cursor: pointer;
+       margin-top: 1rem;
+       /* 24px */
+       transition: background-color 0.2s, box-shadow 0.2s;
+   }
+
    .form-btn:hover {
        background-color: #B18428;
        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

@@ -1,6 +1,6 @@
 {% extends "forms/base.html" %}
 
-{% block title %}Geneva College Alumni Update{% endblock %}
+{% block title %}Geneva College Alumni Record Update{% endblock %}
 
 {% block content %}
 <form method="POST" action="{{ url_for('form.form_step1') }}">
@@ -87,8 +87,8 @@
   </ul>
 {% endif %}
 
-  <h2>Choose Your Update(s)</h2>
-  <p class="form-note">Updating your alumni record allows the College to keep in touch with information that may be relevant to you as an alumnus. Providing an update for your alumni record is voluntary and information submitted through this form will not be published unless you enter a Class Note. Please select which update(s) you would like to submit from the list below.</p>
+  <h2>Choose Your Update Type(s)</h2>
+  <p class="form-note">Updating your alumni record allows the College to keep in touch with information that may be relevant to you as an alumnus. Providing an update for your alumni record is voluntary and information submitted through this form will not be published unless you enter a Class Note. Please select which update type(s) you would like to submit from the list below.</p>
   <div class="field">
   <label class="form-label">{{ form.update_types.label }} <span class="required-asterisk">*</span></label>
   {% for option in form.update_types %}

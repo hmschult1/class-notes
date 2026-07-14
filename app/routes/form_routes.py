@@ -509,6 +509,20 @@ def has_value(value):
         return False
     return True
 
+
+def get_uploaded_image_url(session_data):
+    image_url = session_data.get("image_url")
+    if image_url:
+        return image_url
+
+    uploaded_filename = session_data.get("uploaded_image_filename")
+    if uploaded_filename:
+        upload_folder = current_app.config.get("UPLOAD_FOLDER", "static/uploads")
+        return url_for("static", filename=f"uploads/{uploaded_filename}")
+
+    return None
+
+
 def build_review_sections(session_data):
     # User's degree
     degree_rows = []
@@ -633,7 +647,7 @@ def build_review_sections(session_data):
             "title": "Class Note",
             "fields": [
                 ("Class Note", session_data.get("class_note_text")),
-                ("Uploaded Image", session_data.get("uploaded_image_filename")),
+                ("Uploaded Image", get_uploaded_image_url(session_data)),
             ],
         },
         {
@@ -679,7 +693,7 @@ def form_final_review():
             return redirect(url_for("form.submit_final"))
     
         elif nav == 'prev':
-            return redirect(url_for("form.form_step1"))
+            return redirect(url_for("form.form_volunteer"))
         
     return render_template('forms/review.html', review_sections=review_sections, noteFlag=noteFlag, children=children, form=form) 
 
