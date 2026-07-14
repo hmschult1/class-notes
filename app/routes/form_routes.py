@@ -732,17 +732,16 @@ def submit_final():
         # Geneva educations
         for deg in session.get("geneva_degrees", []):
             year = None
-            if deg == "TUG":
+            if deg == "Undergraduate":
                 year = session.get("undergrad_year")
-            elif deg == "Grad":
+            elif deg == "Graduate":
                 year = session.get("graduate_year")
-            elif deg == "ODP":
+            elif deg == "Online Degree":
                 year = session.get("online_year")
 
             g = AlumniGenevaEducation(
                 alumnus_id=alumnus.id,
                 degree_level=deg,
-                degree=deg,
                 graduation_year=year,
             )
             db.session.add(g)
