@@ -164,7 +164,7 @@ class AlumniGenevaEducation(db.Model):
     )
 
     degree_level = db.Column(db.String(50))  # undergrad, graduate, online
-    degree = db.Column(db.String(150))
+    ## degree = db.Column(db.String(150))
     graduation_year = db.Column(db.String(4))
 
     alumnus = db.relationship(

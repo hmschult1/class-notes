@@ -514,15 +514,15 @@ def build_review_sections(session_data):
     degree_rows = []
 
     degree_label_map = {
-        "TUG": "Undergraduate",
-        "Grad": "Graduate",
-        "ODP": "Online",
+        "Undergraduate": "Undergraduate",
+        "Graduate": "Graduate",
+        "Online": "Online Degree",
     }
     
     degree_year_map = {
-        "TUG": session_data.get("undergrad_year"),
-        "Grad": session_data.get("graduate_year"),
-        "ODP": session_data.get("online_year"),
+        "Undergraduate": session_data.get("undergrad_year"),
+        "Graduate": session_data.get("graduate_year"),
+        "Online": session_data.get("online_year"),
     }
 
     selected_degrees = session_data.get("geneva_degrees") or []
@@ -543,9 +543,9 @@ def build_review_sections(session_data):
     spouse_degree_rows = []
 
     spouse_degree_year_map = {
-        "TUG": session_data.get("spouse_undergrad_year"),
-        "Grad": session_data.get("spouse_graduate_year"),
-        "ODP": session_data.get("spouse_online_year"),
+        "Undergraduate": session_data.get("spouse_undergrad_year"),
+        "Graduate": session_data.get("spouse_graduate_year"),
+        "Online Degree": session_data.get("spouse_online_year"),
     }
 
     spouse_selected_degrees = session_data.get("spouse_geneva_degrees") or []
