@@ -279,6 +279,7 @@ class AlumniClassNote(db.Model):
         unique=True
     )
 
+    nameplate = db.Column(db.String(255))
     class_note_text = db.Column(db.Text)
     image_filename = db.Column(db.String(255))
 
