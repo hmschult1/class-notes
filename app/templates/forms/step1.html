@@ -8,23 +8,31 @@
 
   <h1 style="text-align: center">Update Your Alumni Record</h1>
   <hr>
+
   <h2 style="margin-top: 1.25rem;">Alumni Information</h2>
 
-    <p class="form-note"><span class="required-asterisk">*</span> Required fields</p>
+  <p class="form-note">
+    <span class="required-asterisk">*</span> Required fields
+  </p>
 
   {% for field in [
-      form.first_name, form.last_name, form.maiden_name
+      form.first_name,
+      form.last_name,
+      form.maiden_name
   ] %}
     <div class="field">
       <label class="form-label" for="{{ field.id }}">
         {{ field.label.text }}
+
         {% if field.flags.required %}
           <span class="required-asterisk">*</span>
         {% endif %}
       </label>
-      {{ field(class="form-input" if field.type != 'SelectField' else "form-select") }}
-      
-      {# Display validation errors inline #}
+
+      {{ field(
+        class="form-input" if field.type != "SelectField" else "form-select"
+      ) }}
+
       {% if field.errors %}
         <ul class="form-errors">
           {% for error in field.errors %}
@@ -36,93 +44,163 @@
   {% endfor %}
 
   <div class="field">
-  <label class="form-label">
-    {{ form.geneva_degrees.label }}
-    <span class="required-asterisk">*</span>
-  </label>
+    <label class="form-label">
+      {{ form.geneva_degrees.label }}
+      <span class="required-asterisk">*</span>
+    </label>
 
-  {% for option in form.geneva_degrees %}
-  <div class="geneva-degree-row">
-    <div class="geneva-degree-option">
-      {{ option(class="form-checkbox", id=option.id, required=False) }}
-      <label for="{{ option.id }}">{{ option.label.text }}</label>
-    </div>
+    {% for option in form.geneva_degrees %}
+      <div class="geneva-degree-row">
+        <div class="geneva-degree-option">
+          {{ option(
+            class="form-checkbox",
+            id=option.id,
+            required=False
+          ) }}
 
-    <div class="geneva-degree-year">
-      {% if option._value() == "Undergraduate" %}
-        <div id="undergrad-wrapper" style="display:none;">
-          {{ form.undergrad_year(class="form-input", placeholder="Grad Year") }}
-
-          {% for error in form.undergrad_year.errors %}
-            <div class="form-error">{{ error }}</div>
-          {% endfor %}
-        </div>
-  
-
-      {% elif option._value() == "Graduate" %}
-        <div id="graduate-wrapper" style="display:none;">
-          {{ form.graduate_year(class="form-input", placeholder="Grad Year") }}
-          {% for error in form.graduate_year.errors %}
-            <div class="form-error">{{ error }}</div>
-          {% endfor %}
+          <label for="{{ option.id }}">
+            {{ option.label.text }}
+          </label>
         </div>
 
-      {% elif option._value() == "Online Degree" %}
-        <div id="online-wrapper" style="display:none;">
-          {{ form.online_year(class="form-input", placeholder="Grad Year") }}
-          {% for error in form.online_year.errors %}
-            <div class="form-error">{{ error }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-{% endfor %}
+        <div class="geneva-degree-year">
+          {% if option._value() == "Undergraduate" %}
+            <div id="undergrad-wrapper">
+              {{ form.undergrad_year(
+                class="form-input",
+                placeholder="Grad Year"
+              ) }}
 
-{% if form.geneva_degrees.errors %}
-  <ul class="form-errors">
-    {% for error in form.geneva_degrees.errors %}
-      <li>{{ error }}</li>
+              {% for error in form.undergrad_year.errors %}
+                <div class="form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+          {% elif option._value() == "Graduate" %}
+            <div id="graduate-wrapper">
+              {{ form.graduate_year(
+                class="form-input",
+                placeholder="Grad Year"
+              ) }}
+
+              {% for error in form.graduate_year.errors %}
+                <div class="form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+          {% elif option._value() == "Online Degree" %}
+            <div id="online-wrapper">
+              {{ form.online_year(
+                class="form-input",
+                placeholder="Grad Year"
+              ) }}
+
+              {% for error in form.online_year.errors %}
+                <div class="form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
     {% endfor %}
-  </ul>
-{% endif %}
+
+    {% if form.geneva_degrees.errors %}
+      <ul class="form-errors">
+        {% for error in form.geneva_degrees.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
 
   <h2>Choose Your Update Type(s)</h2>
-  <p class="form-note">Updating your alumni record allows the College to keep in touch with information that may be relevant to you as an alumnus. Providing an update for your alumni record is voluntary and information submitted through this form will not be published unless you enter a Class Note. Please select which update type(s) you would like to submit from the list below.</p>
+
+  <p class="form-note">
+    Updating your alumni record allows the College to keep in touch with
+    information that may be relevant to you as an alumnus. Providing an
+    update for your alumni record is voluntary and information submitted
+    through this form will not be published unless you enter a Class Note.
+    Please select which update type(s) you would like to submit from the
+    list below.
+  </p>
+
   <div class="field">
-  <label class="form-label">{{ form.update_types.label }}</label>
-  {% for option in form.update_types %}
-    <div class="form-checkbox-row">
-      {{ option(class="form-checkbox", id=option.id, ) }}
-      <label for="{{ option.id }}">{{ option.label.text }}</label>
-    </div>
-  {% endfor %}
-  {% if form.update_types.errors %}
-    <div class="form-error">
-      {% for error in form.update_types.errors %}
-        <p>{{ error }}</p>
-      {% endfor %}
-    </div>
-  {% endif %}
-</div>
+    <label class="form-label">
+      {{ form.update_types.label }}
+    </label>
 
+    {% for option in form.update_types %}
+      <div class="form-checkbox-row">
+        {{ option(
+          class="form-checkbox",
+          id=option.id
+        ) }}
 
-<h2>Publish a Class Note</h2>
-<p class="form-note">Share your news with the Geneva community! Class Notes are featured online and in the <i>Geneva Magazine</i>, helping alumni and friends stay connected through life updates, milestones, and accomplishments. To ensure consistency and readability, submissions may be edited for grammar, style, and clarity.</p>
-<div class="field">
-  <label class="form-label">
-    {{ form.wants_class_note.label }} <span class="required-asterisk">*</span></label>
+        <label for="{{ option.id }}">
+          {{ option.label.text }}
+        </label>
+      </div>
+    {% endfor %}
+
+    {% if form.update_types.errors %}
+      <div class="form-error">
+        {% for error in form.update_types.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <h2>Publish a Class Note</h2>
+
+  <p class="form-note">
+    Share your news with the Geneva community! Class Notes are featured
+    online and in the <i>Geneva Magazine</i>, helping alumni and friends
+    stay connected through life updates, milestones, and accomplishments.
+    To ensure consistency and readability, submissions may be edited for
+    grammar, style, and clarity.
+  </p>
+
+  <div class="field">
+    <label class="form-label">
+      {{ form.wants_class_note.label }}
+      <span class="required-asterisk">*</span>
+    </label>
+
     {% for option in form.wants_class_note %}
-    <div class="form-checkbox-row">
-      {{ option(class="form-checkbox", id=option.id) }}
-      <label for="{{ option.id }}">{{ option.label.text }}</label>
-    </div>
-  {% endfor %}
-  </label>
-</div>
+      <div class="form-checkbox-row">
+        {{ option(
+          class="form-checkbox",
+          id=option.id
+        ) }}
 
-  <div class="form-btn-row" style="display: flex; justify-content: flex-end; gap: 1rem;">
-  <button type="submit" name="nav" value="next" class="form-btn">Next Page</button>
-</div>
+        <label for="{{ option.id }}">
+          {{ option.label.text }}
+        </label>
+      </div>
+    {% endfor %}
+
+    {% if form.wants_class_note.errors %}
+      <div class="form-error">
+        {% for error in form.wants_class_note.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div
+    class="form-btn-row"
+    style="display: flex; justify-content: flex-end; gap: 1rem;"
+  >
+    <button
+      type="submit"
+      name="nav"
+      value="next"
+      class="form-btn"
+    >
+      Next Page
+    </button>
+  </div>
 </form>
 {% endblock %}

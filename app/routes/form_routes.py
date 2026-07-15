@@ -172,9 +172,8 @@ def form_step1():
                 "Please select at least one update type or choose to submit a Class Note."
             )
 
-    return render_template("forms/step1.html", form=form)
+        return render_template("forms/step1.html", form=form)
                 
-
     # Prepopulate form from session if available
     if request.method == 'GET':
         form.first_name.data = session.get('first_name')
@@ -562,8 +561,15 @@ def build_review_sections(session_data):
                 "degree": degree,
                 "year": ""
             })
+            
     # Spouse's degree        
     spouse_degree_rows = []
+    
+    spouse_degree_label_map = {
+        "Undergraduate": "Undergraduate",
+        "Graduate": "Graduate",
+        "Online": "Online Degree",
+    }
 
     spouse_degree_year_map = {
         "Undergraduate": session_data.get("spouse_undergrad_year"),
@@ -577,7 +583,7 @@ def build_review_sections(session_data):
         year = spouse_degree_year_map.get(degree)
         if year:
             spouse_degree_rows.append({
-                "degree": degree_label_map.get(degree, degree),
+                "degree": spouse_degree_label_map.get(degree, degree),
                 "year": spouse_degree_year_map.get(degree, "")
             })
         else:

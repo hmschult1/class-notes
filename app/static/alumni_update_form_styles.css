@@ -351,3 +351,11 @@
 .form-errors {
     margin-top: 0.5rem;
 }
+
+.grad-year-wrapper {
+  display: none;
+}
+
+.grad-year-wrapper.is-visible {
+  display: inline-block;
+}
