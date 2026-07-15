@@ -76,17 +76,6 @@ def parse_date(value):
     except ValueError:
         return None
 
-
-# NAVIGATION HELPERS
-def navigate_update(current_update, direction="next"):
-    """Navigate between the selected update pages.
-
-    The wizard records the list of selected update types in session
-    (`update_types`). Given the current update label and a direction
-    ("next" or "prev"), return a redirect to the next route in the
-    sequence. If the update isn't found we return the first step.
-    """
-
 # CONDITIONAL LOGIC HELPER FUNCTIONS 
 UPDATE_ROUTES = {
     "Contact Information": "form.form_contact",
@@ -98,6 +87,13 @@ UPDATE_ROUTES = {
 }
 
 def navigate_update(current_update, direction="next"):
+    """Navigate between the selected update pages.
+
+    The wizard records the list of selected update types in session
+    (`update_types`). Given the current update label and a direction
+    ("next" or "prev"), return a redirect to the next route in the
+    sequence. If the update isn't found we return the first step.
+    """
     selected_updates = session.get("update_types", [])
 
     try:
