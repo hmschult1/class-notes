@@ -190,6 +190,10 @@ def form_contact():
     
     if request.method == 'POST':
         nav = request.form.get('nav')  # 'next' or 'prev'
+
+        if nav == 'prev':
+            return navigate_update("Contact Information", "prev")
+
         if nav == 'next' and form.validate_on_submit():
             # Save form data to session
             session['pref_salutation'] = form.pref_salutation.data
@@ -202,11 +206,10 @@ def form_contact():
             session['state'] = form.state.data
             session['postal_code'] = form.postal_code.data
             session['country'] = form.country.data
-            
+
             return navigate_update("Contact Information", "next")
-        
-        elif nav == 'prev':
-            return navigate_update("Contact Information", "prev")
+
+        return render_template('forms/contact.html', form=form)
 
     # Prepopulate form from session if available
     if request.method == 'GET':
