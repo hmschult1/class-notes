@@ -90,14 +90,22 @@
   <h2>Choose Your Update Type(s)</h2>
   <p class="form-note">Updating your alumni record allows the College to keep in touch with information that may be relevant to you as an alumnus. Providing an update for your alumni record is voluntary and information submitted through this form will not be published unless you enter a Class Note. Please select which update type(s) you would like to submit from the list below.</p>
   <div class="field">
-  <label class="form-label">{{ form.update_types.label }} <span class="required-asterisk">*</span></label>
+  <label class="form-label">{{ form.update_types.label }}</label>
   {% for option in form.update_types %}
     <div class="form-checkbox-row">
       {{ option(class="form-checkbox", id=option.id, ) }}
       <label for="{{ option.id }}">{{ option.label.text }}</label>
     </div>
   {% endfor %}
+  {% if form.update_types.errors %}
+    <div class="form-error">
+      {% for error in form.update_types.errors %}
+        <p>{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
 </div>
+
 
 <h2>Publish a Class Note</h2>
 <p class="form-note">Share your news with the Geneva community! Class Notes are featured online and in the <i>Geneva Magazine</i>, helping alumni and friends stay connected through life updates, milestones, and accomplishments. To ensure consistency and readability, submissions may be edited for grammar, style, and clarity.</p>

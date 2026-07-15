@@ -145,7 +145,6 @@ def form_step1():
     if request.method == 'POST':
         nav = request.form.get('nav')  # 'next' or 'prev'
         if nav == 'next' and form.validate_on_submit():
-            # Save form data to session
             session['first_name'] = form.first_name.data
             session['last_name'] = form.last_name.data
             session['maiden_name'] = form.maiden_name.data
@@ -155,18 +154,25 @@ def form_step1():
             session['graduate_year'] = form.graduate_year.data
             session['online_year'] = form.online_year.data
 
-            selected_updates = form.update_types.data
+            selected_updates = form.update_types.data or []
+            wants_class_note = form.wants_class_note.data
+
             session['update_types'] = selected_updates
             session['update_index'] = 0
-
-            session['wants_class_note'] = form.wants_class_note.data
+            session['wants_class_note'] = wants_class_note
 
             if selected_updates:
                 first_update = selected_updates[0]
                 return redirect(url_for(UPDATE_ROUTES[first_update]))
-            
-        else:
-            return render_template('forms/step1.html', form=form)
+
+            if wants_class_note == "Yes":
+                return redirect(url_for("form.form_class_note"))
+
+            form.update_types.errors.append(
+                "Please select at least one update type or choose to submit a Class Note."
+            )
+
+    return render_template("forms/step1.html", form=form)
                 
 
     # Prepopulate form from session if available
